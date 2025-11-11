@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ITOps</title>
+    <title>ITops Exam</title>
     
     <!-- Load Tailwind CDN first -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -59,36 +59,25 @@
         
         <!-- ATTRIBUTION BLOCK -->
         <div class="text-center mb-4 text-text-secondary text-xs italic">
-            Powered by the brilliant mind - Stas Shnaider, ITOps genius.
+            Powered by the brilliant mind of **Stas Shnaider**, ITOps genius.
         </div>
         <!-- END ATTRIBUTION BLOCK -->
 
-        <!-- Initial Upload State -->
-        <div id="upload-screen" class="bg-card shadow-2xl rounded-2xl p-10 transition duration-300 border border-slate-700/50">
+        <!-- Initial Start Screen (Replaced Upload Screen) -->
+        <div id="start-screen" class="bg-card shadow-2xl rounded-2xl p-10 transition duration-300 border border-slate-700/50">
             <h2 class="text-2xl font-semibold mb-4 text-primary">Full Name</h2>
             
+            <p class="text-text-secondary mb-6">Enter the employee's name to begin the technical assessment. The tool is now fully self-contained and loads questions instantly.</p>
+
             <!-- Employee Name Input -->
             <input type="text" id="employee-name-input" placeholder="Enter Employee Full Name (Required)" 
                    class="w-full p-3 mb-6 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none">
 
-            <h2 class="text-2xl font-semibold mb-4 text-primary">Upload Questions</h2>
-            <p class="text-text-secondary mb-8">This assessment is blind—results are calculated at the end. Please upload your CSV file with columns: **Question, A, B, C, D, CorrectAnswer**.</p>
-            
-            <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
-            
-            <div id="drop-area" 
-                 class="border-2 border-dashed border-primary/50 bg-slate-700/20 rounded-xl p-12 text-center cursor-pointer hover:bg-slate-700/30 transition duration-200"
-                 onclick="document.getElementById('csv-file-input').click()"
-                 ondragover="event.preventDefault(); this.classList.add('border-primary', 'bg-slate-700/40');"
-                 ondragleave="this.classList.remove('border-primary', 'bg-slate-700/40');"
-                 ondrop="event.preventDefault(); handleDrop(event); this.classList.remove('border-primary', 'bg-slate-700/40');">
-                <svg class="mx-auto h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                <p class="mt-3 text-sm font-medium text-text-light">Drag and drop your CSV file here, or click to select.</p>
-            </div>
+            <p id="start-status" class="mt-4 text-center text-sm text-error-text h-5"></p>
 
-            <p id="file-status" class="mt-4 text-center text-sm text-text-secondary h-5"></p>
+            <button onclick="checkNameAndStart()" class="btn-primary w-full text-text-light font-semibold py-3 rounded-lg shadow-lg transition duration-200 mt-4">
+                Start Assessment (13 Questions)
+            </button>
         </div>
 
         <!-- Quiz State -->
@@ -150,13 +139,33 @@
     </div>
 
     <script>
+        // --- EMBEDDED QUESTION DATA ---
+        // Questions are now stored directly in the HTML file for maximum portability.
+        const questions = [
+            // Multiple Choice Questions (A, B, C, D have content)
+            { Category: 'Basic IT', Question: 'What does CPU stand for?', A: 'Central Processing Unit', B: 'Control Processing Unit', C: 'Central Program Unit', D: 'Central Power Unit', CorrectAnswer: 'A' },
+            { Category: 'Basic IT', Question: 'Which device is used to connect a computer to a network?', A: 'Router', B: 'Switch', C: 'Network Interface Card', D: 'Modem', CorrectAnswer: 'C' },
+            { Category: 'Basic IT', Question: 'What is the main function of RAM?', A: 'Store data permanently', B: 'Execute programs', C: 'Temporarily store data for quick access', D: 'Provide backup', CorrectAnswer: 'C' },
+            { Category: 'Basic IT', Question: 'Which type of memory is non-volatile?', A: 'RAM', B: 'Cache', C: 'ROM', D: 'Register', CorrectAnswer: 'C' },
+            { Category: 'Basic IT', Question: 'What does IP address identify?', A: 'A user', B: 'A computer on a network', C: 'A program', D: 'A website name', CorrectAnswer: 'B' },
+            { Category: 'Basic IT', Question: 'What is the basic unit of digital data?', A: 'Bit', B: 'Byte', C: 'Megabyte', D: 'Kilobyte', CorrectAnswer: 'A' },
+            { Category: 'Basic IT', Question: 'What is the function of an operating system?', A: 'Manage hardware and software resources', B: 'Provide antivirus protection', C: 'Control internet speed', D: 'Run BIOS settings', CorrectAnswer: 'A' },
+            { Category: 'Linux', Question: 'Which command is used to list files in Linux?', A: 'ls', B: 'list', C: 'show', D: 'dir', CorrectAnswer: 'A' },
+            { Category: 'Linux', Question: 'What command is used to change directory?', A: 'move', B: 'cd', C: 'chdir', D: 'dir', CorrectAnswer: 'B' },
+            { Category: 'Linux', Question: 'Which file stores user account information?', A: '/etc/passwd', B: '/etc/users', C: '/etc/accounts', D: '/home/passwd', CorrectAnswer: 'A' },
+            { Category: 'Linux', Question: 'How to check current directory path?', A: 'pwd', B: 'where', C: 'dir', D: 'ls -path', CorrectAnswer: 'A' },
+            
+            // Fill-in-the-Blank Questions (A, B, C, D are empty)
+            { Category: 'Linux', Question: 'Which TCP port is used by default for the SSH protocol?', A: '', B: '', C: '', D: '', CorrectAnswer: '22' },
+            { Category: 'Linux', Question: 'What is the default TCP port for the SSH protocol?', A: '', B: '', C: '', D: '', CorrectAnswer: '22' }
+        ];
+
         // Global state variables
-        let questions = [];
         let currentQuestionIndex = 0;
         let score = 0;
         let userAnswers = []; // Array to store user's choices and outcome for recap
         let isQuizActive = false;
-        let employeeName = ''; // New state variable
+        let employeeName = ''; 
         
         const KEYS = {
             QUESTION: 'Question',
@@ -166,122 +175,22 @@
         };
 
         // DOM Elements
-        const uploadScreen = document.getElementById('upload-screen');
+        const startScreen = document.getElementById('start-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const resultsScreen = document.getElementById('results-screen');
-        const fileStatus = document.getElementById('file-status');
-        const dropArea = document.getElementById('drop-area');
+        const startStatus = document.getElementById('start-status');
 
-        // Robust CSV Parser (handles fields enclosed in double quotes containing commas)
-        function parseCSV(csvText) {
-            const lines = csvText.trim().split('\n');
-            if (lines.length === 0) return [];
-            
-            // Function to split a line by comma, respecting double quotes
-            const splitLine = (line) => {
-                const result = [];
-                let current = '';
-                let inQuotes = false;
-                
-                // Remove carriage return at end of line if present
-                line = line.replace(/\r$/, '');
+        // --- Start Logic (Replaces File Upload) ---
 
-                for (let i = 0; i < line.length; i++) {
-                    const char = line[i];
-                    
-                    if (char === '"') {
-                        inQuotes = !inQuotes;
-                    } else if (char === ',' && !inQuotes) {
-                        // Found a separator comma outside of quotes
-                        // Clean quotes and trim whitespace
-                        result.push(current.trim().replace(/^"|"$/g, '')); 
-                        current = '';
-                    } else {
-                        current += char;
-                    }
-                }
-                // Push the last field
-                result.push(current.trim().replace(/^"|"$/g, ''));
-                
-                return result;
-            };
-
-            const headerRow = splitLine(lines[0]);
-            const dataRows = lines.slice(1);
-
-            // Map the header indices to friendly keys
-            const headers = headerRow;
-            const keyMap = {
-                [headers.findIndex(h => h.includes(KEYS.QUESTION))]: KEYS.QUESTION,
-                [headers.findIndex(h => h.includes(KEYS.CATEGORY))]: KEYS.CATEGORY,
-                [headers.findIndex(h => h === KEYS.A)]: KEYS.A,
-                [headers.findIndex(h => h === KEYS.B)]: KEYS.B,
-                [headers.findIndex(h => h === KEYS.C)]: KEYS.C,
-                [headers.findIndex(h => h === KEYS.D)]: KEYS.D,
-                [headers.findIndex(h => h.includes(KEYS.CORRECT))]: KEYS.CORRECT,
-            };
-
-            return dataRows.map(row => {
-                const rowData = splitLine(row);
-                const question = {};
-                rowData.forEach((value, index) => {
-                    if (keyMap[index]) {
-                        question[keyMap[index]] = value;
-                    }
-                });
-                return question;
-            }).filter(q => q[KEYS.QUESTION] && q[KEYS.CORRECT]); // Filter out invalid rows
-        }
-        
-        // --- Event Handlers ---
-
-        function handleDrop(event) {
-            const files = event.dataTransfer.files;
-            if (files.length > 0) {
-                processFile(files[0]);
-            }
-        }
-
-        function handleFileUpload(event) {
-            const files = event.target.files;
-            if (files.length > 0) {
-                processFile(files[0]);
-            }
-        }
-
-        function processFile(file) {
+        function checkNameAndStart() {
             const name = document.getElementById('employee-name-input').value.trim();
             if (!name) {
-                fileStatus.textContent = 'Error: Please enter the employee\'s full name before uploading the CSV.';
-                dropArea.classList.remove('pointer-events-none');
+                startStatus.textContent = 'Error: Please enter the employee\'s full name.';
                 return;
             }
             employeeName = name; // Store the name globally
-            
-            fileStatus.textContent = `Loading ${file.name}...`;
-            dropArea.classList.add('pointer-events-none');
-            
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                try {
-                    questions = parseCSV(e.target.result);
-                    
-                    if (questions.length === 0) {
-                        fileStatus.textContent = 'Error: No valid questions found in the CSV file.';
-                        dropArea.classList.remove('pointer-events-none');
-                        return;
-                    }
-
-                    fileStatus.textContent = `${questions.length} questions loaded. Assessment starting...`;
-                    setTimeout(startQuiz, 1500);
-
-                } catch (error) {
-                    console.error("CSV Parsing Error:", error);
-                    fileStatus.textContent = 'Error parsing CSV. Please check the file format.';
-                    dropArea.classList.remove('pointer-events-none');
-                }
-            };
-            reader.readAsText(file);
+            startStatus.textContent = '';
+            startQuiz();
         }
 
         function startQuiz() {
@@ -289,7 +198,7 @@
             score = 0;
             userAnswers = []; // Reset attempts
             isQuizActive = true;
-            uploadScreen.classList.add('hidden');
+            startScreen.classList.add('hidden');
             quizScreen.classList.remove('hidden');
             
             displayQuestion();
@@ -370,7 +279,7 @@
             // Normalize submitted answer and correct answer(s) for comparison
             const submitted = submittedAnswer.toLowerCase();
             const correctRaw = q[KEYS.CORRECT];
-            // Allow multiple correct answers separated by '|' in the CSV
+            // Allow multiple correct answers separated by '|' in the data
             const correctAnswers = correctRaw.split('|').map(a => a.trim().toLowerCase()); 
 
             const isCorrect = correctAnswers.includes(submitted);
@@ -461,9 +370,6 @@
             nameElement.textContent = employeeName;
             scoreDisplayBox.insertBefore(nameElement, scoreDisplayBox.firstElementChild);
 
-
-            // NOTE: Detailed recap rendering logic removed as requested, 
-            // the employee will only see the overall score and the buttons.
             const recapContainer = document.getElementById('recap-container');
             recapContainer.innerHTML = '';
         }
@@ -549,7 +455,7 @@
                             <span class="prefix-incorrect">❌ YOUR ANSWER (Incorrect):</span> ${selectedText}
                         </div>
                         <div class="option-div option-correct-answer">
-                            <span class="prefix-correct">✔️ CORRECT ANSWER:</span> ${correctText}
+                            <span class="prefix-correct">✔️ CORRECT ANSWER(S):</span> ${correctText.split('|').join(', ')}
                         </div>`;
                     }
                 }
@@ -567,20 +473,20 @@
         }
 
         function resetApp() {
-            questions = [];
+            // Reinitialize the state variables
             currentQuestionIndex = 0;
             score = 0;
             userAnswers = [];
             isQuizActive = false;
             employeeName = '';
             
+            // Show the start screen
             resultsScreen.classList.add('hidden');
             quizScreen.classList.add('hidden');
-            uploadScreen.classList.remove('hidden');
+            startScreen.classList.remove('hidden');
             
-            fileStatus.textContent = '';
-            dropArea.classList.remove('pointer-events-none');
-            document.getElementById('csv-file-input').value = null;
+            // Clear inputs and status
+            startStatus.textContent = '';
             document.getElementById('employee-name-input').value = '';
 
             // Clean up dynamically added name element in case it exists
