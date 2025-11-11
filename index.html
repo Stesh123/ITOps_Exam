@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITOps</title>
+    
+    <!-- Load Tailwind CDN first -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration MUST now come AFTER the CDN script loads to ensure the 'tailwind' object is defined. -->
+    <script>
+        // Define the configuration object AFTER the Tailwind CDN script loads.
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                darkMode: 'class',
+                theme: {
+                    extend: {
+                        colors: {
+                            'primary': '#4f46e5', /* Indigo 600 */
+                            'secondary': '#1f2937',
+                            'background': '#0f172a', /* Slate 900 */
+                            'card': '#1e293b', /* Slate 800 */
+                            'text-light': '#f1f5f9', /* Slate 100 */
+                            'text-secondary': '#94a3b8', /* Slate 400 */
+                            'selection': '#334155', /* Slate 700 for selected option */
+                            'error-text': '#f87171', /* Red 400 */
+                        }
+                    }
+                }
+            }
+        } else {
+            console.error("Tailwind object is still undefined after loading CDN.");
+        }
+    </script>
+    <style>
+        /* Custom font import for aesthetics */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        :root {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom button styling for gradient/depth */
+        .btn-primary {
+            background: linear-gradient(145deg, #6366f1, #4f46e5);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(145deg, #4f46e5, #3730a3);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-background text-text-light min-h-screen flex items-center justify-center p-4">
+
+    <div id="app" class="w-full max-w-2xl">
+        <h1 class="text-4xl font-extrabold text-center text-primary mb-10 tracking-wide">ITOps Exam</h1>
+        
+        <!-- ATTRIBUTION BLOCK -->
+        <div class="text-center mb-4 text-text-secondary text-xs italic">
+            Powered by the brilliant mind - Stas Shnaider, ITOps genius.
+        </div>
+        <!-- END ATTRIBUTION BLOCK -->
+
+        <!-- Initial Upload State -->
+        <div id="upload-screen" class="bg-card shadow-2xl rounded-2xl p-10 transition duration-300 border border-slate-700/50">
+            <h2 class="text-2xl font-semibold mb-4 text-primary">Full Name</h2>
+            
+            <!-- Employee Name Input -->
+            <input type="text" id="employee-name-input" placeholder="Enter Employee Full Name (Required)" 
+                   class="w-full p-3 mb-6 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none">
+
+            <h2 class="text-2xl font-semibold mb-4 text-primary">Upload Questions</h2>
+            <p class="text-text-secondary mb-8">This assessment is blind—results are calculated at the end. Please upload your CSV file with columns: **Question, A, B, C, D, CorrectAnswer**.</p>
+            
+            <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
+            
+            <div id="drop-area" 
+                 class="border-2 border-dashed border-primary/50 bg-slate-700/20 rounded-xl p-12 text-center cursor-pointer hover:bg-slate-700/30 transition duration-200"
+                 onclick="document.getElementById('csv-file-input').click()"
+                 ondragover="event.preventDefault(); this.classList.add('border-primary', 'bg-slate-700/40');"
+                 ondragleave="this.classList.remove('border-primary', 'bg-slate-700/40');"
+                 ondrop="event.preventDefault(); handleDrop(event); this.classList.remove('border-primary', 'bg-slate-700/40');">
+                <svg class="mx-auto h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <p class="mt-3 text-sm font-medium text-text-light">Drag and drop your CSV file here, or click to select.</p>
+            </div>
+
+            <p id="file-status" class="mt-4 text-center text-sm text-text-secondary h-5"></p>
+        </div>
+
+        <!-- Quiz State -->
+        <div id="quiz-screen" class="hidden bg-card shadow-2xl rounded-2xl p-10 border border-slate-700/50">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
+                <h2 class="text-xl font-semibold text-primary" id="question-number">Question 1/X</h2>
+                <span id="current-score" class="text-base font-medium text-text-secondary px-3 py-1 bg-slate-700/50 rounded-full">Score: Hidden</span>
+            </div>
+            
+            <div class="mb-10">
+                <p id="question-text" class="text-2xl font-light mb-3"></p>
+                <p id="question-category" class="text-sm text-primary/70 italic"></p>
+            </div>
+
+            <div id="options-container" class="space-y-4">
+                <!-- Options rendered here for MCQ -->
+            </div>
+
+            <!-- New: Fill-in-the-blank input container -->
+            <div id="fill-in-container" class="space-y-4 hidden">
+                <input type="text" id="answer-input" placeholder="Type your answer here..." 
+                       class="w-full p-4 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none text-xl">
+                <p id="answer-error" class="text-error-text text-sm h-5"></p>
+                <button id="submit-answer-btn" onclick="submitFillInAnswer()" 
+                        class="btn-primary w-full text-text-light font-semibold py-4 rounded-lg transition duration-200">
+                    Submit Answer
+                </button>
+            </div>
+        </div>
+
+        <!-- Results State -->
+        <div id="results-screen" class="hidden bg-card shadow-2xl rounded-2xl p-10 border border-slate-700/50">
+            <h2 class="text-3xl font-bold text-primary mb-3 text-center" id="results-title">Assessment Completed</h2>
+            <!-- Updated text to reflect that only the score is visible here -->
+            <p class="text-lg text-text-secondary mb-8 text-center">Final Overall Score</p>
+
+            <div class="p-6 bg-slate-800/50 rounded-xl mb-8 text-center">
+                <!-- Employee Name will be inserted here dynamically -->
+                <p class="text-xl font-medium text-text-secondary">Overall Score:</p>
+                <div class="text-7xl font-extrabold text-white mt-1" id="final-score-display">--/--</div>
+            </div>
+            
+            <!-- BUTTONS MOVED UP HERE, close to name/score -->
+            <div class="mb-10 pt-4 flex space-x-4 justify-center">
+                <button onclick="printRecap()" class="btn-primary text-text-light font-semibold py-3 px-6 rounded-lg transition duration-200">
+                    Print Summary (Detailed Recap)
+                </button>
+                <button onclick="resetApp()" class="bg-slate-600 hover:bg-slate-500 text-text-light font-semibold py-3 px-6 rounded-lg shadow-lg transition duration-200">
+                    Restart
+                </button>
+            </div>
+            
+            <!-- The detailed recap container remains, but is hidden and no longer populated by JS -->
+            <div id="recap-container" class="hidden">
+                <!-- Recap items will NOT be rendered here, only in the print window -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Global state variables
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = []; // Array to store user's choices and outcome for recap
+        let isQuizActive = false;
+        let employeeName = ''; // New state variable
+        
+        const KEYS = {
+            QUESTION: 'Question',
+            CATEGORY: 'Category',
+            A: 'A', B: 'B', C: 'C', D: 'D',
+            CORRECT: 'CorrectAnswer'
+        };
+
+        // DOM Elements
+        const uploadScreen = document.getElementById('upload-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const fileStatus = document.getElementById('file-status');
+        const dropArea = document.getElementById('drop-area');
+
+        // Robust CSV Parser (handles fields enclosed in double quotes containing commas)
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            if (lines.length === 0) return [];
+            
+            // Function to split a line by comma, respecting double quotes
+            const splitLine = (line) => {
+                const result = [];
+                let current = '';
+                let inQuotes = false;
+                
+                // Remove carriage return at end of line if present
+                line = line.replace(/\r$/, '');
+
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        // Found a separator comma outside of quotes
+                        // Clean quotes and trim whitespace
+                        result.push(current.trim().replace(/^"|"$/g, '')); 
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                // Push the last field
+                result.push(current.trim().replace(/^"|"$/g, ''));
+                
+                return result;
+            };
+
+            const headerRow = splitLine(lines[0]);
+            const dataRows = lines.slice(1);
+
+            // Map the header indices to friendly keys
+            const headers = headerRow;
+            const keyMap = {
+                [headers.findIndex(h => h.includes(KEYS.QUESTION))]: KEYS.QUESTION,
+                [headers.findIndex(h => h.includes(KEYS.CATEGORY))]: KEYS.CATEGORY,
+                [headers.findIndex(h => h === KEYS.A)]: KEYS.A,
+                [headers.findIndex(h => h === KEYS.B)]: KEYS.B,
+                [headers.findIndex(h => h === KEYS.C)]: KEYS.C,
+                [headers.findIndex(h => h === KEYS.D)]: KEYS.D,
+                [headers.findIndex(h => h.includes(KEYS.CORRECT))]: KEYS.CORRECT,
+            };
+
+            return dataRows.map(row => {
+                const rowData = splitLine(row);
+                const question = {};
+                rowData.forEach((value, index) => {
+                    if (keyMap[index]) {
+                        question[keyMap[index]] = value;
+                    }
+                });
+                return question;
+            }).filter(q => q[KEYS.QUESTION] && q[KEYS.CORRECT]); // Filter out invalid rows
+        }
+        
+        // --- Event Handlers ---
+
+        function handleDrop(event) {
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function handleFileUpload(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function processFile(file) {
+            const name = document.getElementById('employee-name-input').value.trim();
+            if (!name) {
+                fileStatus.textContent = 'Error: Please enter the employee\'s full name before uploading the CSV.';
+                dropArea.classList.remove('pointer-events-none');
+                return;
+            }
+            employeeName = name; // Store the name globally
+            
+            fileStatus.textContent = `Loading ${file.name}...`;
+            dropArea.classList.add('pointer-events-none');
+            
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    questions = parseCSV(e.target.result);
+                    
+                    if (questions.length === 0) {
+                        fileStatus.textContent = 'Error: No valid questions found in the CSV file.';
+                        dropArea.classList.remove('pointer-events-none');
+                        return;
+                    }
+
+                    fileStatus.textContent = `${questions.length} questions loaded. Assessment starting...`;
+                    setTimeout(startQuiz, 1500);
+
+                } catch (error) {
+                    console.error("CSV Parsing Error:", error);
+                    fileStatus.textContent = 'Error parsing CSV. Please check the file format.';
+                    dropArea.classList.remove('pointer-events-none');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = []; // Reset attempts
+            isQuizActive = true;
+            uploadScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            
+            displayQuestion();
+        }
+
+        // --- Quiz Logic (MCQ and FITB) ---
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                showResults();
+                return;
+            }
+
+            const q = questions[currentQuestionIndex];
+            const total = questions.length;
+            
+            document.getElementById('question-number').textContent = `Question ${currentQuestionIndex + 1}/${total}`;
+            document.getElementById('question-text').textContent = q[KEYS.QUESTION];
+            
+            const categoryText = q[KEYS.CATEGORY] ? `Category: ${q[KEYS.CATEGORY]}` : 'Category: General';
+            document.getElementById('question-category').textContent = categoryText;
+
+            const optionsContainer = document.getElementById('options-container');
+            const fillInContainer = document.getElementById('fill-in-container');
+            const answerInput = document.getElementById('answer-input');
+            const answerError = document.getElementById('answer-error');
+
+            // Determine question type: MCQ if option A has content, otherwise FITB
+            const isMCQ = !!q[KEYS.A].trim(); 
+
+            optionsContainer.innerHTML = '';
+            answerInput.value = ''; // Clear input field
+            answerError.textContent = ''; // Clear any previous error
+
+            if (isMCQ) {
+                optionsContainer.classList.remove('hidden');
+                fillInContainer.classList.add('hidden');
+
+                const optionKeys = ['A', 'B', 'C', 'D'];
+                
+                optionKeys.forEach(key => {
+                    if (q[key]) {
+                        const button = document.createElement('button');
+                        button.textContent = `${key}. ${q[key]}`;
+                        // Neutral styling for options
+                        button.className = `option-button w-full text-left p-4 rounded-lg bg-slate-700 hover:bg-primary/50 transition duration-150 shadow-md font-medium`;
+                        button.onclick = () => selectMCQAnswer(key);
+                        button.id = `option-${key}`;
+                        optionsContainer.appendChild(button);
+                    }
+                });
+
+            } else {
+                // Fill-in-the-blank question
+                optionsContainer.classList.add('hidden');
+                fillInContainer.classList.remove('hidden');
+            }
+            isQuizActive = true;
+        }
+
+        function submitFillInAnswer() {
+            if (!isQuizActive) return;
+
+            const q = questions[currentQuestionIndex];
+            const answerInput = document.getElementById('answer-input');
+            const answerError = document.getElementById('answer-error');
+            const submittedAnswer = answerInput.value.trim();
+            
+            if (!submittedAnswer) {
+                answerError.textContent = 'Please enter an answer.';
+                answerInput.focus();
+                return;
+            }
+            
+            answerError.textContent = '';
+            isQuizActive = false; // Lock interaction
+
+            // Normalize submitted answer and correct answer(s) for comparison
+            const submitted = submittedAnswer.toLowerCase();
+            const correctRaw = q[KEYS.CORRECT];
+            // Allow multiple correct answers separated by '|' in the CSV
+            const correctAnswers = correctRaw.split('|').map(a => a.trim().toLowerCase()); 
+
+            const isCorrect = correctAnswers.includes(submitted);
+
+            // Record and advance logic
+            recordAndAdvance(isCorrect, submittedAnswer);
+        }
+
+        function selectMCQAnswer(selectedKey) {
+            if (!isQuizActive) return;
+            isQuizActive = false; // Prevent double clicking
+
+            const q = questions[currentQuestionIndex];
+            const correctKey = q[KEYS.CORRECT];
+            const isCorrect = selectedKey === correctKey;
+
+            // Disable all buttons immediately and apply a neutral selected style (Aesthetic only)
+            document.querySelectorAll('.option-button').forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('bg-slate-700', 'hover:bg-primary/50');
+
+                if (btn.id === `option-${selectedKey}`) {
+                    // Neutral selection highlight: shows the user what they picked without confirming correctness
+                    btn.classList.add('bg-selection', 'ring-2', 'ring-primary/50'); 
+                } else {
+                     // Duller unselected options
+                     btn.classList.add('bg-slate-700/30', 'text-text-secondary'); 
+                }
+            });
+            
+            // Record and advance logic
+            recordAndAdvance(isCorrect, selectedKey);
+        }
+
+        // New common function for handling results and moving on
+        function recordAndAdvance(isCorrect, selectedAnswer) {
+            const q = questions[currentQuestionIndex];
+
+            // PRIVATE SCORE UPDATE
+            if (isCorrect) {
+                score++;
+            }
+            
+            // Record the attempt for the recap
+            userAnswers.push({
+                question: q[KEYS.QUESTION],
+                category: q[KEYS.CATEGORY],
+                isMCQ: !!q[KEYS.A].trim(),
+                options: { 
+                    A: q[KEYS.A], 
+                    B: q[KEYS.B], 
+                    C: q[KEYS.C], 
+                    D: q[KEYS.D] 
+                },
+                selected: selectedAnswer, // This holds the key (A, B, C, D) or the typed string
+                correct: q[KEYS.CORRECT],
+                isCorrect: isCorrect
+            });
+            
+            // Move to next question quickly (300ms delay)
+            setTimeout(() => {
+                currentQuestionIndex++;
+                displayQuestion();
+            }, 300);
+        }
+
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+
+            const total = questions.length;
+            
+            document.getElementById('final-score-display').textContent = `${score}/${total}`;
+            
+            // Dynamically insert employee name into the score box
+            const scoreDisplayBox = document.querySelector('#final-score-display').parentNode;
+            
+            // Remove previous name element if exists
+            let existingNameElement = document.getElementById('employee-name-display');
+            if (existingNameElement) {
+                existingNameElement.remove();
+            }
+
+            // Add the new name element
+            const nameElement = document.createElement('p');
+            nameElement.id = 'employee-name-display';
+            nameElement.className = 'text-2xl font-bold text-text-light mb-2';
+            nameElement.textContent = employeeName;
+            scoreDisplayBox.insertBefore(nameElement, scoreDisplayBox.firstElementChild);
+
+
+            // NOTE: Detailed recap rendering logic removed as requested, 
+            // the employee will only see the overall score and the buttons.
+            const recapContainer = document.getElementById('recap-container');
+            recapContainer.innerHTML = '';
+        }
+        
+        function printRecap() {
+            const total = questions.length;
+            const percentage = total > 0 ? ((score / total) * 100).toFixed(1) : 0;
+            
+            // Prepare suggested filename based on employee name and date
+            const formattedName = employeeName.replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_'); // Sanitize name
+            const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+            const suggestedFilename = `${formattedName}_Assessment_Summary_${date}`;
+
+            let content = `
+                <style>
+                    /* Basic styles for printability */
+                    body { font-family: sans-serif; margin: 30px; color: #212121; }
+                    h1 { color: #4f46e5; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+                    h2 { margin-top: 30px; color: #333; }
+                    .score-box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; text-align: center; }
+                    .score-number { font-size: 3em; font-weight: bold; }
+                    /* Recap specific styles */
+                    .question-item { border: 1px solid #ddd; padding: 15px; margin-top: 15px; border-radius: 8px; page-break-inside: avoid; }
+                    .question-text { font-weight: bold; margin-bottom: 10px; }
+                    .option-div { padding: 5px; border-radius: 4px; margin-bottom: 4px; }
+                    
+                    /* Color coding for print */
+                    .option-correct-choice { background-color: #d4edda; border: 1px solid #c3e6cb; } /* Light Green */
+                    .option-incorrect-choice { background-color: #f8d7da; border: 1px solid #f5c6cb; } /* Light Red */
+                    .option-correct-answer { background-color: #e2f0d4; border: 1px solid #c9e0b1; } /* Lighter Green for correction */
+                    
+                    .prefix-correct { color: #155724; font-weight: bold; }
+                    .prefix-incorrect { color: #721c24; font-weight: bold; }
+                </style>
+                <h1>Tier 3 Assessment Summary for ${employeeName}</h1>
+                <div class="score-box">
+                    <h2>Overall Score:</h2>
+                    <div class="score-number">${score}/${total}</div>
+                    <p>Percentage: ${percentage}%</p>
+                    <p>Date: ${new Date().toLocaleDateString('en-US')}</p>
+                </div>
+                
+                <h2>Detailed Exam Recap</h2>
+            `;
+            
+            // This loop remains to generate the detailed content for the PDF/Print window
+            userAnswers.forEach((attempt, index) => {
+                let questionRecap = `<div class="question-item">
+                    <p class="question-text">${index + 1}. ${attempt.question}</p>`;
+                
+                if (attempt.isMCQ) {
+                    // MCQ RECAP LOGIC
+                    Object.keys(attempt.options).forEach(key => {
+                        const optionText = attempt.options[key];
+                        let optionClass = '';
+                        let prefix = '';
+                        
+                        if (key === attempt.selected && key === attempt.correct) {
+                            optionClass = 'option-correct-choice';
+                            prefix = '<span class="prefix-correct">✅ CORRECT CHOICE:</span> ';
+                        } else if (key === attempt.selected && key !== attempt.correct) {
+                            optionClass = 'option-incorrect-choice';
+                            prefix = '<span class="prefix-incorrect">❌ YOUR CHOICE:</span> ';
+                        } else if (key === attempt.correct) {
+                            optionClass = 'option-correct-answer';
+                            prefix = '<span class="prefix-correct">✔️ CORRECT ANSWER:</span> ';
+                        }
+                        
+                        questionRecap += `<div class="option-div ${optionClass}">${key}. ${prefix}${optionText}</div>`;
+                    });
+                } else {
+                    // FITB RECAP LOGIC
+                    const selectedText = attempt.selected;
+                    const correctText = attempt.correct;
+                    const isCorrect = attempt.isCorrect;
+
+                    if (isCorrect) {
+                        questionRecap += `<div class="option-div option-correct-choice">
+                            <span class="prefix-correct">✅ YOUR ANSWER (Correct):</span> ${selectedText}
+                        </div>`;
+                    } else {
+                        questionRecap += `<div class="option-div option-incorrect-choice">
+                            <span class="prefix-incorrect">❌ YOUR ANSWER (Incorrect):</span> ${selectedText}
+                        </div>
+                        <div class="option-div option-correct-answer">
+                            <span class="prefix-correct">✔️ CORRECT ANSWER:</span> ${correctText}
+                        </div>`;
+                    }
+                }
+
+                questionRecap += `</div>`;
+                content += questionRecap;
+            });
+
+            const printWindow = window.open('', '', 'height=600,width=800');
+            // This line sets the suggested filename when saving as PDF
+            printWindow.document.title = suggestedFilename; 
+            printWindow.document.write(content);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function resetApp() {
+            questions = [];
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+            isQuizActive = false;
+            employeeName = '';
+            
+            resultsScreen.classList.add('hidden');
+            quizScreen.classList.add('hidden');
+            uploadScreen.classList.remove('hidden');
+            
+            fileStatus.textContent = '';
+            dropArea.classList.remove('pointer-events-none');
+            document.getElementById('csv-file-input').value = null;
+            document.getElementById('employee-name-input').value = '';
+
+            // Clean up dynamically added name element in case it exists
+            let existingNameElement = document.getElementById('employee-name-display');
+            if (existingNameElement) {
+                existingNameElement.remove();
+            }
+        }
+    </script>
+</body>
+</html>
