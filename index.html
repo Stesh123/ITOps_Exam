@@ -63,7 +63,7 @@
         </div>
         <!-- END ATTRIBUTION BLOCK -->
 
-        <!-- Initial  Screen (Replaced Upload Screen) -->
+        <!-- Initial Screen (Replaced Upload Screen) -->
         <div id="-screen" class="bg-card shadow-2xl rounded-2xl p-10 transition duration-300 border border-slate-700/50">
             <h2 class="text-2xl font-semibold mb-4 text-primary">Full Name</h2>
             
@@ -71,7 +71,7 @@
 
             <!-- Employee Name Input -->
             <input type="text" id="employee-name-input" placeholder="Enter Employee Full Name (Required)" 
-                   class="w-full p-3 mb-6 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none">
+                    class="w-full p-3 mb-6 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none">
 
             <p id="-status" class="mt-4 text-center text-sm text-error-text h-5"></p>
 
@@ -99,7 +99,7 @@
             <!-- New: Fill-in-the-blank input container -->
             <div id="fill-in-container" class="space-y-4 hidden">
                 <input type="text" id="answer-input" placeholder="Type your answer here..." 
-                       class="w-full p-4 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none text-xl">
+                        class="w-full p-4 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none text-xl">
                 <p id="answer-error" class="text-error-text text-sm h-5"></p>
                 <button id="submit-answer-btn" onclick="submitFillInAnswer()" 
                         class="btn-primary w-full text-text-light font-semibold py-4 rounded-lg transition duration-200">
@@ -195,10 +195,11 @@
         };
 
         // DOM Elements
-        const startScreen = document.getElementById('start-screen');
+        // FIX: Update the element IDs to match the HTML structure (using -screen and -status)
+        const startScreen = document.getElementById('-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const resultsScreen = document.getElementById('results-screen');
-        const startStatus = document.getElementById('start-status');
+        const startStatus = document.getElementById('-status'); // FIXED ID reference
 
         // --- Start Logic (Replaces File Upload) ---
 
@@ -218,6 +219,7 @@
             score = 0;
             userAnswers = []; // Reset attempts
             isQuizActive = true;
+            // Now startScreen is correctly identified, so this line will work:
             startScreen.classList.add('hidden');
             quizScreen.classList.remove('hidden');
             
@@ -325,8 +327,8 @@
                     // Neutral selection highlight: shows the user what they picked without confirming correctness
                     btn.classList.add('bg-selection', 'ring-2', 'ring-primary/50'); 
                 } else {
-                     // Duller unselected options
-                     btn.classList.add('bg-slate-700/30', 'text-text-secondary'); 
+                    // Duller unselected options
+                    btn.classList.add('bg-slate-700/30', 'text-text-secondary'); 
                 }
             });
             
@@ -518,6 +520,3 @@
     </script>
 </body>
 </html>
-
-
-
