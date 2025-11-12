@@ -142,23 +142,42 @@
         // --- EMBEDDED QUESTION DATA ---
         // Questions are now stored directly in the HTML file for maximum portability.
         const questions = [
-            // Multiple Choice Questions (A, B, C, D have content)
-            { Category: 'Linux', Question: 'Why are you gay?', A: '', B: '', C: '', D: '', CorrectAnswer: 'Yes' },
-            { Category: 'Basic IT', Question: 'What does CPU stand for?', A: 'Central Processing Unit', B: 'Control Processing Unit', C: 'Central Program Unit', D: 'Central Power Unit', CorrectAnswer: 'A' },
-            { Category: 'Basic IT', Question: 'Which device is used to connect a computer to a network?', A: 'Router', B: 'Switch', C: 'Network Interface Card', D: 'Modem', CorrectAnswer: 'C' },
-            { Category: 'Basic IT', Question: 'What is the main function of RAM?', A: 'Store data permanently', B: 'Execute programs', C: 'Temporarily store data for quick access', D: 'Provide backup', CorrectAnswer: 'C' },
-            { Category: 'Basic IT', Question: 'Which type of memory is non-volatile?', A: 'RAM', B: 'Cache', C: 'ROM', D: 'Register', CorrectAnswer: 'C' },
-            { Category: 'Basic IT', Question: 'What does IP address identify?', A: 'A user', B: 'A computer on a network', C: 'A program', D: 'A website name', CorrectAnswer: 'B' },
-            { Category: 'Basic IT', Question: 'What is the basic unit of digital data?', A: 'Bit', B: 'Byte', C: 'Megabyte', D: 'Kilobyte', CorrectAnswer: 'A' },
-            { Category: 'Basic IT', Question: 'What is the function of an operating system?', A: 'Manage hardware and software resources', B: 'Provide antivirus protection', C: 'Control internet speed', D: 'Run BIOS settings', CorrectAnswer: 'A' },
-            { Category: 'Linux', Question: 'Which command is used to list files in Linux?', A: 'ls', B: 'list', C: 'show', D: 'dir', CorrectAnswer: 'A' },
-            { Category: 'Linux', Question: 'What command is used to change directory?', A: 'move', B: 'cd', C: 'chdir', D: 'dir', CorrectAnswer: 'B' },
-            { Category: 'Linux', Question: 'Which file stores user account information?', A: '/etc/passwd', B: '/etc/users', C: '/etc/accounts', D: '/home/passwd', CorrectAnswer: 'A' },
-            { Category: 'Linux', Question: 'How to check current directory path?', A: 'pwd', B: 'where', C: 'dir', D: 'ls -path', CorrectAnswer: 'A' },
-            
-            // Fill-in-the-Blank Questions (A, B, C, D are empty)
-            { Category: 'Linux', Question: 'Which TCP port is used by default for the SSH protocol?', A: '', B: '', C: '', D: '', CorrectAnswer: '22' },
-            { Category: 'Linux', Question: 'What is the default TCP port for the SSH protocol?', A: '', B: '', C: '', D: '', CorrectAnswer: '22' }
+            // ================= IT ARCHITECT =================
+{ Category: 'IT Architect', Question: 'Which architecture pattern separates an application into presentation, logic, and data layers?', A: 'Monolithic', B: '3-Tier', C: 'Event-Driven', D: 'Microservices', CorrectAnswer: 'B' },
+{ Category: 'IT Architect', Question: 'What is a key advantage of microservices architecture?', A: 'Single deployment unit', B: 'Independent scalability', C: 'Tight coupling', D: 'Single point of failure', CorrectAnswer: 'B' },
+{ Category: 'IT Architect', Question: 'Which protocol is typically used for service communication in REST APIs?', A: 'FTP', B: 'HTTP/HTTPS', C: 'SNMP', D: 'SSH', CorrectAnswer: 'B' },
+{ Category: 'IT Architect', Question: 'Which concept ensures that system components can continue functioning even if one part fails?', A: 'Fault Tolerance', B: 'Load Balancing', C: 'Data Encryption', D: 'Caching', CorrectAnswer: 'A' },
+{ Category: 'IT Architect', Question: 'Which cloud model provides virtual machines and storage but requires user-managed OS?', A: 'SaaS', B: 'PaaS', C: 'IaaS', D: 'DBaaS', CorrectAnswer: 'C' },
+// Fill-in-the-Blank
+{ Category: 'IT Architect', Question: 'The architectural principle of dividing services into small independent components is called ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'microservices' },
+
+// ================= LINUX =================
+{ Category: 'Linux', Question: 'Which command displays real-time system processes?', A: 'ps', B: 'top', C: 'df', D: 'free', CorrectAnswer: 'B' },
+{ Category: 'Linux', Question: 'Which file defines mounted file systems at boot?', A: '/etc/fstab', B: '/etc/mount', C: '/etc/rc.local', D: '/etc/startup.conf', CorrectAnswer: 'A' },
+{ Category: 'Linux', Question: 'Which command changes file permissions?', A: 'chperm', B: 'chmod', C: 'chgrp', D: 'chown', CorrectAnswer: 'B' },
+{ Category: 'Linux', Question: 'Which command is used to display disk space usage?', A: 'df -h', B: 'du -a', C: 'lsblk', D: 'fdisk -l', CorrectAnswer: 'A' },
+// Fill-in-the-Blank
+{ Category: 'Linux', Question: 'The default superuser account in Linux is called ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'root' },
+{ Category: 'Linux', Question: 'The configuration file for network interfaces in Ubuntu is located in ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '/etc/netplan/' },
+
+// ================= VMWARE =================
+{ Category: 'VMware', Question: 'Which VMware component manages multiple ESXi hosts?', A: 'vCenter Server', B: 'vSphere Client', C: 'vMotion', D: 'vSAN', CorrectAnswer: 'A' },
+{ Category: 'VMware', Question: 'What feature allows a VM to move between hosts without downtime?', A: 'vSAN', B: 'vMotion', C: 'HA', D: 'DRS', CorrectAnswer: 'B' },
+{ Category: 'VMware', Question: 'Which VMware feature ensures automatic restart of VMs after host failure?', A: 'vMotion', B: 'FT', C: 'HA', D: 'DRS', CorrectAnswer: 'C' },
+{ Category: 'VMware', Question: 'Which protocol is used by VMware ESXi for management communication?', A: 'SSH', B: 'HTTPS', C: 'Telnet', D: 'RDP', CorrectAnswer: 'B' },
+// Fill-in-the-Blank
+{ Category: 'VMware', Question: 'The default username for the vCenter Server Appliance is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'administrator@vsphere.local' },
+{ Category: 'VMware', Question: 'The file extension for a VMware virtual disk is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '.vmdk' },
+
+// ================= NETWORK =================
+{ Category: 'Network', Question: 'Which protocol is used to translate domain names to IP addresses?', A: 'DHCP', B: 'DNS', C: 'NAT', D: 'ARP', CorrectAnswer: 'B' },
+{ Category: 'Network', Question: 'Which layer of the OSI model handles routing?', A: 'Data Link', B: 'Transport', C: 'Network', D: 'Session', CorrectAnswer: 'C' },
+{ Category: 'Network', Question: 'Which command is used to test network connectivity?', A: 'ping', B: 'netstat', C: 'ipconfig', D: 'nslookup', CorrectAnswer: 'A' },
+{ Category: 'Network', Question: 'Which device operates at Layer 2 of the OSI model?', A: 'Router', B: 'Switch', C: 'Hub', D: 'Firewall', CorrectAnswer: 'B' },
+// Fill-in-the-Blank
+{ Category: 'Network', Question: 'The default subnet mask for a Class C network is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '255.255.255.0' },
+{ Category: 'Network', Question: 'The protocol used for secure remote management over TCP port 22 is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'SSH' },
+
         ];
 
         // Global state variables
@@ -499,4 +518,5 @@
     </script>
 </body>
 </html>
+
 
