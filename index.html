@@ -17,14 +17,14 @@
                         colors: {
                             'primary': '#4f46e5', /* Indigo 600 */
                             'secondary': '#1f2937',
-                      'background': '#0f172a', /* Slate 900 */
+                            'background': '#0f172a', /* Slate 900 */
                             'card': '#1e293b', /* Slate 800 */
                             'text-light': '#f1f5f9', /* Slate 100 */
                             'text-secondary': '#94a3b8', /* Slate 400 */
                             'selection': '#334155', /* Slate 700 for selected option */
                             'error-text': '#f87171', /* Red 400 */
                         }
-              _       }
+                    }
                 }
             }
         } else {
@@ -65,7 +65,7 @@
         <div class="text-center mb-4 text-text-secondary text-xs italic">
             Powered by the brilliant mind - Stas Shnaider, ITOps genius.
         </div>
-        <div id="start-screen" class="bg-card shadow-2xl rounded-2xl p-10 transition duration-300 border border-slate-700/50">
+        <div id="-screen" class="bg-card shadow-2xl rounded-2xl p-10 transition duration-300 border border-slate-700/50">
             <h2 class="text-2xl font-semibold mb-4 text-primary">Full Name</h2>
             
             <p class="text-text-secondary mb-6">Enter the employee's name to begin the technical assessment. The tool is now fully self-contained and loads questions instantly.</p>
@@ -73,7 +73,7 @@
             <input type="text" id="employee-name-input" placeholder="Enter Employee Full Name (Required)" 
                    class="w-full p-3 mb-6 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none">
 
-            <p id="start-status" class="mt-4 text-center text-sm text-error-text h-5"></p>
+            <p id="-status" class="mt-4 text-center text-sm text-error-text h-5"></p>
 
             <button onclick="checkNameAndStart()" class="btn-primary w-full text-text-light font-semibold py-3 rounded-lg shadow-lg transition duration-200 mt-4">
                 Start Exam
@@ -89,10 +89,10 @@
             <div class="mb-10">
                 <p id="question-text" class="text-2xl font-light mb-3"></p>
                 <p id="question-category" class="text-sm text-primary/70 italic"></p>
-            </div>
+          _ </div>
 
             <div id="options-container" class="space-y-4">
-                            </div>
+                </div>
 
             <div id="fill-in-container" class="space-y-4 hidden">
                 <input type="text" id="answer-input" placeholder="Type your answer here..." 
@@ -134,7 +134,7 @@
             </div>
             
             <div id="recap-container" class="hidden">
-                            </div>
+s           </div>
         </div>
 
     </div>
@@ -145,7 +145,7 @@
             // ================= IT ARCHITECT =================
             { Category: 'IT Architect', Question: 'Which architecture pattern separates an application into presentation, logic, and data layers?', A: 'Monolithic', B: '3-Tier', C: 'Event-Driven', D: 'Microservices', CorrectAnswer: 'B' },
             { Category: 'IT Architect', Question: 'What is a key advantage of microservices architecture?', A: 'Single deployment unit', B: 'Independent scalability', C: 'Tight coupling', D: 'Single point of failure', CorrectAnswer: 'B' },
-trigger         { Category: 'IT Architect', Question: 'Which protocol is typically used for service communication in REST APIs?', A: 'FTP', B: 'HTTP/HTTPS', C: 'SNMP', D: 'SSH', CorrectAnswer: 'B' },
+            { Category: 'IT Architect', Question: 'Which protocol is typically used for service communication in REST APIs?', A: 'FTP', B: 'HTTP/HTTPS', C: 'SNMP', D: 'SSH', CorrectAnswer: 'B' },
             { Category: 'IT Architect', Question: 'Which concept ensures that system components can continue functioning even if one part fails?', A: 'Fault Tolerance', B: 'Load Balancing', C: 'Data Encryption', D: 'Caching', CorrectAnswer: 'A' },
             { Category: 'IT Architect', Question: 'Which cloud model provides virtual machines and storage but requires user-managed OS?', A: 'SaaS', B: 'PaaS', C: 'IaaS', D: 'DBaaS', CorrectAnswer: 'C' },
             // Fill-in-the-Blank
@@ -155,7 +155,7 @@ trigger         { Category: 'IT Architect', Question: 'Which protocol is typ
             { Category: 'Linux', Question: 'Which command displays real-time system processes?', A: 'ps', B: 'top', C: 'df', D: 'free', CorrectAnswer: 'B' },
             { Category: 'Linux', Question: 'Which file defines mounted file systems at boot?', A: '/etc/fstab', B: '/etc/mount', C: '/etc/rc.local', D: '/etc/startup.conf', CorrectAnswer: 'A' },
             { Category: 'Linux', Question: 'Which command changes file permissions?', A: 'chperm', B: 'chmod', C: 'chgrp', D: 'chown', CorrectAnswer: 'B' },
-            { Category: 'Linux', Question: 'Which command is used to display disk space usage?', A: 'df -h', B: 'du -a', C: 'lsblk', D: 'fdisk -l', CorrectAnswer: 'A' },
+          _ { Category: 'Linux', Question: 'Which command is used to display disk space usage?', A: 'df -h', B: 'du -a', C: 'lsblk', D: 'fdisk -l', CorrectAnswer: 'A' },
             // Fill-in-the-Blank
             { Category: 'Linux', Question: 'The default superuser account in Linux is called ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'root' },
             { Category: 'Linux', Question: 'The configuration file for network interfaces in Ubuntu is located in ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '/etc/netplan/' },
@@ -167,16 +167,16 @@ trigger         { Category: 'IT Architect', Question: 'Which protocol is typ
             { Category: 'VMware', Question: 'Which protocol is used by VMware ESXi for management communication?', A: 'SSH', B: 'HTTPS', C: 'Telnet', D: 'RDP', CorrectAnswer: 'B' },
             // Fill-in-the-Blank
             { Category: 'VMware', Question: 'The default username for the vCenter Server Appliance is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'administrator@vsphere.local' },
-em           { Category: 'VMware', Question: 'The file extension for a VMware virtual disk is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '.vmdk' },
+            { Category: 'VMware', Question: 'The file extension for a VMware virtual disk is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '.vmdk' },
 
             // ================= NETWORK =================
             { Category: 'Network', Question: 'Which protocol is used to translate domain names to IP addresses?', A: 'DHCP', B: 'DNS', C: 'NAT', D: 'ARP', CorrectAnswer: 'B' },
             { Category: 'Network', Question: 'Which layer of the OSI model handles routing?', A: 'Data Link', B: 'Transport', C: 'Network', D: 'Session', CorrectAnswer: 'C' },
             { Category: 'Network', Question: 'Which command is used to test network connectivity?', A: 'ping', B: 'netstat', C: 'ipconfig', D: 'nslookup', CorrectAnswer: 'A' },
-Do           { Category: 'Network', Question: 'Which device operates at Layer 2 of the OSI model?', A: 'Router', B: 'Switch', C: 'Hub', D: 'Firewall', CorrectAnswer: 'B' },
-Re           // Fill-in-the-Blank
+            { Category: 'Network', Question: 'Which device operates at Layer 2 of the OSI model?', A: 'Router', B: 'Switch', C: 'Hub', D: 'Firewall', CorrectAnswer: 'B' },
+            // Fill-in-the-Blank
             { Category: 'Network', Question: 'The default subnet mask for a Class C network is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '255.255.255.0' },
-Mi           { Category: 'Network', Question: 'The protocol used for secure remote management over TCP port 22 is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'SSH' },
+i           { Category: 'Network', Question: 'The protocol used for secure remote management over TCP port 22 is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'SSH' },
         ];
 
         // Global state variables
@@ -193,12 +193,12 @@ Mi           { Category: 'Network', Question: 'The protocol used for secure
         };
 
         // DOM Elements
-        const startScreen = document.getElementById('start-screen');
+        const startScreen = document.getElementById('-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const resultsScreen = document.getElementById('results-screen');
-        const startStatus = document.getElementById('start-status');
+        const startStatus = document.getElementById('-status');
         const nextButton = document.getElementById('next-btn');
-        const prevButton = document.getElementById('prev-btn');
+s       const prevButton = document.getElementById('prev-btn');
         const answerInput = document.getElementById('answer-input');
 
 
@@ -221,7 +221,7 @@ Mi           { Category: 'Network', Question: 'The protocol used for secure
             userAnswers = questions.map(q => ({
                 question: q[KEYS.QUESTION],
                 category: q[KEYS.CATEGORY],
-                isMCQ: !!(q[KEYS.A] && q[KEYS.A].trim()), // Check if A is a non-empty string
+                isMCQ: !!q[KEYS.A].trim(),
                 options: { A: q[KEYS.A], B: q[KEYS.B], C: q[KEYS.C], D: q[KEYS.D] },
                 selected: null, // Stores the selected key (A, B, C, D) or the typed string
                 correct: q[KEYS.CORRECT],
@@ -249,7 +249,7 @@ Mi           { Category: 'Network', Question: 'The protocol used for secure
             }
 
             const q = questions[currentQuestionIndex];
-            const attempt = userAnswers[currentQuestionIndex];
+s           const attempt = userAnswers[currentQuestionIndex];
             const total = questions.length;
 
             document.getElementById('question-number').textContent = `Question ${currentQuestionIndex + 1}/${total}`;
@@ -283,7 +283,7 @@ Mi           { Category: 'Network', Question: 'The protocol used for secure
                         // Highlight selected option if available
                         if (attempt.selected === key) {
                             // MODIFIED: Use the bright primary color and a light ring for a clear selection
-                            className = `option-button w-full text-left p-4 rounded-lg bg-primary ring-2 ring-text-light transition duration-150 shadow-md font-medium`;
+          _                 className = `option-button w-full text-left p-4 rounded-lg bg-primary ring-2 ring-text-light transition duration-150 shadow-md font-medium`;
                         }
 
                         button.className = className;
@@ -291,7 +291,7 @@ Mi           { Category: 'Network', Question: 'The protocol used for secure
                         button.id = `option-${key}`;
                         optionsContainer.appendChild(button);
                     }
-        _         });
+                });
 
             } else {
                 // Fill-in-the-blank question
@@ -301,7 +301,7 @@ Mi           { Category: 'Network', Question: 'The protocol used for secure
                 // Load previous answer
                 if (attempt.selected !== null) {
                     answerInput.value = attempt.selected;
-Note               }
+                }
                 
                 // Use oninput to track changes immediately
                 answerInput.oninput = submitFillInAnswer; 
@@ -312,7 +312,7 @@ Note               }
             updateNavigationButtons();
         }
 
-  _     function updateNextButtonState() {
+        function updateNextButtonState() {
             const attempt = userAnswers[currentQuestionIndex];
             const isAnswered = attempt && attempt.selected !== null && attempt.selected.toString().trim() !== '';
             nextButton.disabled = !isAnswered;
@@ -342,14 +342,14 @@ Note               }
 
             // Highlight the new selection
             const selectedButton = document.getElementById(`option-${selectedKey}`);
-            if (selectedButton) {
+s           if (selectedButton) {
                 selectedButton.classList.remove('bg-slate-700', 'hover:bg-primary/50');
                 // MODIFIED: Use the bright primary color and a light ring
                 selectedButton.classList.add('bg-primary', 'ring-2', 'ring-text-light');
             }
 
             // 4. Enable the Next button
-            updateNextButtonState();
+      _   updateNextButtonState();
         }
 
         function submitFillInAnswer() {
@@ -362,7 +362,7 @@ Note               }
 
             // 2. Calculate correctness
             if (submittedAnswer) {
-C               const submitted = submittedAnswer.toLowerCase();
+                const submitted = submittedAnswer.toLowerCase();
                 const correctRaw = q[KEYS.CORRECT];
                 const correctAnswers = correctRaw.split('|').map(a => a.trim().toLowerCase());
                 attempt.isCorrect = correctAnswers.includes(submitted);
@@ -392,7 +392,7 @@ C               const submitted = submittedAnswer.toLowerCase();
             if (!isAnswered) {
                 document.getElementById('answer-error').textContent = attempt.isMCQ 
                     ? 'Please select an answer before moving to the next question.'
-                    : 'Please enter an answer before moving to the next question.';
+    _               : 'Please enter an answer before moving to the next question.';
                 return;
             }
 
@@ -404,7 +404,7 @@ C               const submitted = submittedAnswer.toLowerCase();
             } else {
                 // Last question answered, finish the exam
                 showResults();
-            }
+  _       }
         }
 
         // --- Results and Recap Logic ---
@@ -415,7 +415,7 @@ C               const submitted = submittedAnswer.toLowerCase();
                 if (attempt.isCorrect) {
                     finalScore++;
                 }
-Two         });
+            });
             return finalScore;
         }
 
@@ -424,7 +424,7 @@ Two         });
             const finalScore = calculateFinalScore();
             const total = questions.length;
             
-            // Set the old `score` variable here for compatibility with `printRecap`.
+          _ // Set the old `score` variable here for compatibility with `printRecap`.
             score = finalScore;
 
             quizScreen.classList.add('hidden');
@@ -443,10 +443,10 @@ Two         });
             const nameElement = document.createElement('p');
             nameElement.id = 'employee-name-display';
             nameElement.className = 'text-2xl font-bold text-text-light mb-2';
-ten         nameElement.textContent = employeeName;
+            nameElement.textContent = employeeName;
             scoreDisplayBox.insertBefore(nameElement, scoreDisplayBox.firstElementChild);
 
-            const recapContainer = document.getElementById('recap-container');
+s           const recapContainer = document.getElementById('recap-container');
             recapContainer.innerHTML = '';
         }
 
@@ -457,37 +457,37 @@ ten         nameElement.textContent = employeeName;
 
             // Prepare suggested filename based on employee name and date
             const formattedName = employeeName.replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_'); // Sanitize name
-            const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+s           const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
             const suggestedFilename = `${formattedName}_Assessment_Summary_${date}`;
 
             let content = `
                 <style>
-image                 /* Basic styles for printability */
+                    /* Basic styles for printability */
                     body { font-family: sans-serif; margin: 30px; color: #212121; }
                     h1 { color: #4f46e5; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
                     h2 { margin-top: 30px; color: #333; }
-A                   .score-box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; text-align: center; }
+                    .score-box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; text-align: center; }
                     .score-number { font-size: 3em; font-weight: bold; }
                     /* Recap specific styles */
                     .question-item { border: 1px solid #ddd; padding: 15px; margin-top: 15px; border-radius: 8px; page-break-inside: avoid; }
                     .question-text { font-weight: bold; margin-bottom: 10px; }
                     .option-div { padding: 5px; border-radius: 4px; margin-bottom: 4px; }
                     
-                    /* Color coding for print */
+            nbsp       /* Color coding for print */
                     .option-correct-choice { background-color: #d4edda; border: 1px solid #c3e6cb; } /* Light Green */
                     .option-incorrect-choice { background-color: #f8d7da; border: 1px solid #f5c6cb; } /* Light Red */
                     .option-correct-answer { background-color: #e2f0d4; border: 1px solid #c9e0b1; } /* Lighter Green for correction */
                     
                     .prefix-correct { color: #155724; font-weight: bold; }
-                    .prefix-incorrect { color: #721c24; font-weight: bold; }
+s                   .prefix-incorrect { color: #721c24; font-weight: bold; }
                 </style>
                 <h1>Tier 3 Assessment Summary for ${employeeName}</h1>
                 <div class="score-box">
                     <h2>Overall Score:</h2>
-The                   <div class="score-number">${finalScore}/${total}</div>
+                    <div class="score-number">${finalScore}/${total}</div>
                     <p>Percentage: ${percentage}%</p>
                     <p>Date: ${new Date().toLocaleDateString('en-US')}</p>
-                </div>
+nbsp             </div>
                 
                 <h2>Detailed Exam Recap</h2>
             `;
@@ -503,26 +503,26 @@ The                   <div class="score-number">${finalScore}/${total}<
                         const optionText = attempt.options[key];
                         if (!optionText) return; // Skip empty options
                         
-                        let optionClass = '';
+    section               let optionClass = '';
                         let prefix = '';
                         
                         if (key === attempt.selected && attempt.isCorrect) {
-source                     optionClass = 'option-correct-choice';
+A                         optionClass = 'option-correct-choice';
                             prefix = '<span class="prefix-correct">✅ CORRECT CHOICE:</span> ';
-A                     } else if (key === attempt.selected && !attempt.isCorrect) {
+                        } else if (key === attempt.selected && !attempt.isCorrect) {
                             optionClass = 'option-incorrect-choice';
                             prefix = '<span class="prefix-incorrect">❌ YOUR CHOICE:</span> ';
                         } else if (key === attempt.correct) {
                             optionClass = 'option-correct-answer';
                             prefix = '<span class="prefix-correct">✔️ CORRECT ANSWER:</span> ';
-                _     }
+                        }
                         
                         questionRecap += `<div class="option-div ${optionClass}">${key}. ${prefix}${optionText}</div>`;
-Note                 });
+                    });
                 } else {
                     // FITB RECAP LOGIC
-image                 const selectedText = attempt.selected || "No Answer Given";
-                    const correctText = attempt.correct;
+                    const selectedText = attempt.selected || "No Answer Given";
+s                   const correctText = attempt.correct;
                     const isCorrect = attempt.isCorrect;
 
                     if (isCorrect) {
@@ -531,15 +531,15 @@ A                           <span class="prefix-correct">✅ YOUR A
                         </div>`;
                     } else {
                         questionRecap += `<div class="option-div option-incorrect-choice">
-A                           <span class="prefix-incorrect">❌ YOUR ANSWER (Incorrect):</span> ${selectedText}
+Do                         <span class="prefix-incorrect">❌ YOUR ANSWER (Incorrect):</span> ${selectedText}
                         </div>
                         <div class="option-div option-correct-answer">
-Here                         <span class="prefix-correct">✔️ CORRECT ANSWER(S):</span> ${correctText.split('|').join(', ')}
+                            <span class="prefix-correct">✔️ CORRECT ANSWER(S):</span> ${correctText.split('|').join(', ')}
                         </div>`;
                     }
                 }
 
-Show               questionRecap += `</div>`;
+Do               questionRecap += `</div>`;
                 content += questionRecap;
             });
             
@@ -548,28 +548,28 @@ Show               questionRecap += `</div>`;
             const printWindow = window.open('', '', 'height=600,width=800');
             printWindow.document.title = suggestedFilename;
             printWindow.document.write(content);
-Example           printWindow.document.close();
+            printWindow.document.close();
             printWindow.print();
         }
 
         function resetApp() {
             // Reinitialize the state variables
-            currentQuestionIndex = 0;
+B           currentQuestionIndex = 0;
             score = 0; 
             userAnswers = [];
             employeeName = '';
             
             // Show the start screen
-CSS           resultsScreen.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
             quizScreen.classList.add('hidden');
             startScreen.classList.remove('hidden');
             
             // Clear inputs and status
-            startStatus.textContent = '';
+  _         startStatus.textContent = '';
             document.getElementById('employee-name-input').value = '';
 
-Show           // Clean up dynamically added name element in case it exists
-            let existingNameElement = document.getElementById('employee-name-display');
+            // Clean up dynamically added name element in case it exists
+      A     let existingNameElement = document.getElementById('employee-name-display');
             if (existingNameElement) {
                 existingNameElement.remove();
             }
