@@ -56,9 +56,6 @@
              opacity: 0.6;
         }
     </style>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
 </head>
 <body class="bg-background text-text-light min-h-screen flex items-center justify-center p-4">
 
@@ -204,33 +201,31 @@
         const prevButton = document.getElementById('prev-btn');
         const answerInput = document.getElementById('answer-input');
 
-        <script>
-        // (Your entire existing quiz script...)
-    </script>
-
-    <script>
-      // Your web app's Firebase configuration
-      const firebaseConfig = {
-        apiKey: "AIzaSyCVDZPURarcDmSZTsQTUIs_8VxNLQrkSmc",
-        authDomain: "examitops.firebaseapp.com",
-        projectId: "examitops",
-        storageBucket: "examitops.firebasestorage.app",
-        messagingSenderId: "605108026221",
-        appId: "1:605108026221:web:ad7f3147f5645c11cc3864",
-        measurementId: "G-Y70D2ZDQHZ"
-      };
-
-      // Initialize Firebase
-      const app = firebase.initializeApp(firebaseConfig);
-      
-      // Initialize Analytics and Firestore
-      const analytics = firebase.analytics(app);
-      const db = firebase.firestore(app); // This 'db' object is our database!
-
-      console.log("Firebase initialized successfully!");
-    </script>
 
         // --- Start Logic ---
+       <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js"></script>
+
+<script>
+  // --- Firebase Configuration ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyCVDZPURarcDmSZTsQTUIs_8VxNLQrkSmc",
+    authDomain: "examitops.firebaseapp.com",
+    projectId: "examitops",
+    storageBucket: "examitops.firebasestorage.app",
+    messagingSenderId: "605108026221",
+    appId: "1:605108026221:web:ad7f3147f5645c11cc3864",
+    measurementId: "G-Y70D2ZDQHZ"
+  };
+
+  // --- Initialize Firebase ---
+  const app = firebase.initializeApp(firebaseConfig);
+  const analytics = firebase.analytics();
+  const db = firebase.firestore();
+</script>
+ 
 
         function checkNameAndStart() {
             const name = document.getElementById('employee-name-input').value.trim();
@@ -445,69 +440,26 @@
         }
 
         async function showResults() {
-        // Calculate the final score based on the saved userAnswers array
-        const finalScore = calculateFinalScore();
-        const total = questions.length;
-        
-        // Set the old `score` variable here for compatibility with `printRecap`.
-        score = finalScore;
+  const finalScore = calculateFinalScore();
+  const total = questions.length;
 
-        quizScreen.classList.add('hidden');
-        resultsScreen.classList.remove('hidden');
+  // Save to Firestore
+  try {
+    await db.collection("examResults").add({
+      name: employeeName,
+      score: finalScore,
+      total: total,
+      percentage: (finalScore / total) * 100,
+      timestamp: new Date()
+    });
+    console.log("Result saved to Firebase");
+  } catch (e) {
+    console.error("Error saving result:", e);
+  }
 
-        document.getElementById('final-score-display').textContent = `${finalScore}/${total}`;
+  // existing UI update code...
+}
 
-        // (Your existing code to display the employee name...)
-        const scoreDisplayBox = document.querySelector('#final-score-display').parentNode;
-        let existingNameElement = document.getElementById('employee-name-display');
-        if (existingNameElement) {
-            existingNameElement.remove();
-        }
-        const nameElement = document.createElement('p');
-        nameElement.id = 'employee-name-display';
-        nameElement.className = 'text-2xl font-bold text-text-light mb-2';
-        nameElement.textContent = employeeName;
-        scoreDisplayBox.insertBefore(nameElement, scoreDisplayBox.firstElementChild);
-
-        const recapContainer = document.getElementById('recap-container');
-        recapContainer.innerHTML = '';
-
-
-        // --- NEW CODE TO SAVE TO FIREBASE ---
-        try {
-            console.log("Attempting to save results to Firebase...");
-
-            // 1. Create a data object with the results.
-            //    'userAnswers' is the array you already built!
-            const examResult = {
-                name: employeeName,
-                score: finalScore,
-                totalQuestions: total,
-                percentage: total > 0 ? ((finalScore / total) * 100).toFixed(1) : 0,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Adds a server timestamp
-                answers: userAnswers // Saves the entire detailed answer array
-            };
-
-            // 2. Add the data to a Firestore "collection" named "examResults"
-            //    Firestore will automatically create a new document with a unique ID.
-            const docRef = await db.collection("examResults").add(examResult);
-            
-            console.log("Results saved successfully! Document ID: ", docRef.id);
-
-            // Optional: Give the user feedback on the results screen
-            const resultsTitle = document.getElementById('results-title');
-            resultsTitle.textContent = "Exam Completed (Results Saved)";
-
-        } catch (error) {
-            console.error("Error saving results to Firebase: ", error);
-            
-            // Optional: Show an error to the user
-            const resultsTitle = document.getElementById('results-title');
-            resultsTitle.textContent = "Exam Completed (Save Failed)";
-            resultsTitle.classList.add('text-error-text'); // Use your error color
-        }
-        // --- END OF NEW CODE ---
-    }
 
         function printRecap() {
             const total = questions.length;
