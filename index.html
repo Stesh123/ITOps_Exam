@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-R">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ITOps Exam</title>
     
@@ -65,7 +65,7 @@
         <div class="text-center mb-4 text-text-secondary text-xs italic">
             Powered by the brilliant mind - Stas Shnaider, ITOps genius.
         </div>
-        <div id="-screen" class="bg-card shadow-2xl rounded-2xl p-10 transition duration-300 border border-slate-700/50">
+        <div id="start-screen" class="bg-card shadow-2xl rounded-2xl p-10 transition duration-300 border border-slate-700/50">
             <h2 class="text-2xl font-semibold mb-4 text-primary">Full Name</h2>
             
             <p class="text-text-secondary mb-6">Enter the employee's name to begin the technical assessment. The tool is now fully self-contained and loads questions instantly.</p>
@@ -73,7 +73,7 @@
             <input type="text" id="employee-name-input" placeholder="Enter Employee Full Name (Required)" 
                    class="w-full p-3 mb-6 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none">
 
-            <p id="-status" class="mt-4 text-center text-sm text-error-text h-5"></p>
+            <p id="start-status" class="mt-4 text-center text-sm text-error-text h-5"></p>
 
             <button onclick="checkNameAndStart()" class="btn-primary w-full text-text-light font-semibold py-3 rounded-lg shadow-lg transition duration-200 mt-4">
                 Start Exam
@@ -139,7 +139,28 @@
 
     </div>
 
-    <script>
+    <script type="module">
+        // Import Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyCVDZPURarcDmSZTsQTUIs_8VxNLQrkSmc",
+          authDomain: "examitops.firebaseapp.com",
+          projectId: "examitops",
+          storageBucket: "examitops.firebasestorage.app",
+          messagingSenderId: "605108026221",
+          appId: "1:605108026221:web:ad7f3147f5645c11cc3864",
+          measurementId: "G-Y70D2ZDQHZ"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
         // --- EMBEDDED QUESTION DATA ---
         const questions = [
             // ================= IT ARCHITECT =================
@@ -193,10 +214,10 @@
         };
 
         // DOM Elements
-        const startScreen = document.getElementById('-screen');
+        const startScreen = document.getElementById('start-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const resultsScreen = document.getElementById('results-screen');
-        const startStatus = document.getElementById('-status');
+        const startStatus = document.getElementById('start-status');
         const nextButton = document.getElementById('next-btn');
         const prevButton = document.getElementById('prev-btn');
         const answerInput = document.getElementById('answer-input');
@@ -416,6 +437,36 @@
             return finalScore;
         }
 
+        async function sendResultsToDatabase() {
+            const finalScore = calculateFinalScore();
+            const total = questions.length;
+            const percentage = total > 0 ? ((finalScore / total) * 100).toFixed(1) : 0;
+            const timestamp = new Date().toISOString();
+
+            const resultData = {
+                employeeName,
+                score: finalScore,
+                total,
+                percentage,
+                timestamp,
+                answers: userAnswers.map(attempt => ({
+                    question: attempt.question,
+                    category: attempt.category,
+                    selected: attempt.selected,
+                    correct: attempt.correct,
+                    isCorrect: attempt.isCorrect
+                }))
+            };
+
+            try {
+                const docRef = await addDoc(collection(db, "examResults"), resultData);
+                console.log("Results sent to database with ID: ", docRef.id);
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                alert("Failed to send results to database. Please try again.");
+            }
+        }
+
         function showResults() {
             // Calculate the final score based on the saved userAnswers array
             const finalScore = calculateFinalScore();
@@ -445,6 +496,9 @@
 
             const recapContainer = document.getElementById('recap-container');
             recapContainer.innerHTML = '';
+
+            // Send results to Firebase
+            sendResultsToDatabase();
         }
 
         function printRecap() {
