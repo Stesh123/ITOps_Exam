@@ -123,7 +123,7 @@
         </div>
     </div>
 
-    <!-- ====================== MODULE SCRIPT ====================== -->
+    <!-- ====================== MODULE SCRIPT WITH ALL QUESTIONS ====================== -->
     <script type="module">
         // ---------- Firebase ----------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -144,8 +144,40 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        // ---------- Questions ----------
-        const questions = [ /* … (your question array – unchanged) … */ ];
+        // ---------- ALL 24 QUESTIONS (FULLY RESTORED) ----------
+        const questions = [
+            // ================= IT ARCHITECT =================
+            { Category: 'IT Architect', Question: 'Which architecture pattern separates an application into presentation, logic, and data layers?', A: 'Monolithic', B: '3-Tier', C: 'Event-Driven', D: 'Microservices', CorrectAnswer: 'B' },
+            { Category: 'IT Architect', Question: 'What is a key advantage of microservices architecture?', A: 'Single deployment unit', B: 'Independent scalability', C: 'Tight coupling', D: 'Single point of failure', CorrectAnswer: 'B' },
+            { Category: 'IT Architect', Question: 'Which protocol is typically used for service communication in REST APIs?', A: 'FTP', B: 'HTTP/HTTPS', C: 'SNMP', D: 'SSH', CorrectAnswer: 'B' },
+            { Category: 'IT Architect', Question: 'Which concept ensures that system components can continue functioning even if one part fails?', A: 'Fault Tolerance', B: 'Load Balancing', C: 'Data Encryption', D: 'Caching', CorrectAnswer: 'A' },
+            { Category: 'IT Architect', Question: 'Which cloud model provides virtual machines and storage but requires user-managed OS?', A: 'SaaS', B: 'PaaS', C: 'IaaS', D: 'DBaaS', CorrectAnswer: 'C' },
+            { Category: 'IT Architect', Question: 'The architectural principle of dividing services into small independent components is called ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'microservices' },
+
+            // ================= LINUX =================
+            { Category: 'Linux', Question: 'Which command displays real-time system processes?', A: 'ps', B: 'top', C: 'df', D: 'free', CorrectAnswer: 'B' },
+            { Category: 'Linux', Question: 'Which file defines mounted file systems at boot?', A: '/etc/fstab', B: '/etc/mount', C: '/etc/rc.local', D: '/etc/startup.conf', CorrectAnswer: 'A' },
+            { Category: 'Linux', Question: 'Which command changes file permissions?', A: 'chperm', B: 'chmod', C: 'chgrp', D: 'chown', CorrectAnswer: 'B' },
+            { Category: 'Linux', Question: 'Which command is used to display disk space usage?', A: 'df -h', B: 'du -a', C: 'lsblk', D: 'fdisk -l', CorrectAnswer: 'A' },
+            { Category: 'Linux', Question: 'The default superuser account in Linux is called ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'root' },
+            { Category: 'Linux', Question: 'The configuration file for network interfaces in Ubuntu is located in ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '/etc/netplan/' },
+
+            // ================= VMWARE =================
+            { Category: 'VMware', Question: 'Which VMware component manages multiple ESXi hosts?', A: 'vCenter Server', B: 'vSphere Client', C: 'vMotion', D: 'vSAN', CorrectAnswer: 'A' },
+            { Category: 'VMware', Question: 'What feature allows a VM to move between hosts without downtime?', A: 'vSAN', B: 'vMotion', C: 'HA', D: 'DRS', CorrectAnswer: 'B' },
+            { Category: 'VMware', Question: 'Which VMware feature ensures automatic restart of VMs after host failure?', A: 'vMotion', B: 'FT', C: 'HA', D: 'DRS', CorrectAnswer: 'C' },
+            { Category: 'VMware', Question: 'Which protocol is used by VMware ESXi for management communication?', A: 'SSH', B: 'HTTPS', C: 'Telnet', D: 'RDP', CorrectAnswer: 'B' },
+            { Category: 'VMware', Question: 'The default username for the vCenter Server Appliance is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'administrator@vsphere.local' },
+            { Category: 'VMware', Question: 'The file extension for a VMware virtual disk is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '.vmdk' },
+
+            // ================= NETWORK =================
+            { Category: 'Network', Question: 'Which protocol is used to translate domain names to IP addresses?', A: 'DHCP', B: 'DNS', C: 'NAT', D: 'ARP', CorrectAnswer: 'B' },
+            { Category: 'Network', Question: 'Which layer of the OSI model handles routing?', A: 'Data Link', B: 'Transport', C: 'Network', D: 'Session', CorrectAnswer: 'C' },
+            { Category: 'Network', Question: 'Which command is used to test network connectivity?', A: 'ping', B: 'netstat', C: 'ipconfig', D: 'nslookup', CorrectAnswer: 'A' },
+            { Category: 'Network', Question: 'Which device operates at Layer 2 of the OSI model?', A: 'Router', B: 'Switch', C: 'Hub', D: 'Firewall', CorrectAnswer: 'B' },
+            { Category: 'Network', Question: 'The default subnet mask for a Class C network is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '255.255.255.0' },
+            { Category: 'Network', Question: 'The protocol used for secure remote management over TCP port 22 is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'SSH' },
+        ];
 
         // ---------- Global State ----------
         let currentQuestionIndex = 0;
@@ -164,12 +196,12 @@
         const prevButton    = document.getElementById('prev-btn');
         const answerInput   = document.getElementById('answer-input');
 
-        // ---------- Helper Functions ----------
+        // ---------- Helper ----------
         function calculateFinalScore() {
             return userAnswers.reduce((s, a) => s + (a.isCorrect ? 1 : 0), 0);
         }
 
-        // ---------- Core Functions (exposed globally) ----------
+        // ---------- Expose Functions Globally ----------
         const exam = {
             checkNameAndStart,
             startQuiz,
@@ -179,7 +211,7 @@
             printRecap,
             resetApp
         };
-        window.exam = exam;   // <-- makes them reachable from inline handlers
+        window.exam = exam;
 
         // ----- START -----
         function checkNameAndStart() {
@@ -314,7 +346,7 @@
             }
         }
 
-        // ----- RESULTS -----
+        // ----- RESULTS & FIREBASE -----
         async function sendResultsToDatabase() {
             const finalScore = calculateFinalScore();
             const total = questions.length;
@@ -432,7 +464,6 @@ h1{color:#4f46e5;border-bottom:2px solid #ddd;padding-bottom:10px;}
             const nameEl = document.getElementById('employee-name-display');
             if (nameEl) nameEl.remove();
         }
-
     </script>
 </body>
 </html>
