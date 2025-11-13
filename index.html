@@ -60,7 +60,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
 </head>
-    
 <body class="bg-background text-text-light min-h-screen flex items-center justify-center p-4">
 
     <div id="app" class="w-full max-w-2xl">
@@ -69,7 +68,7 @@
         <div class="text-center mb-4 text-text-secondary text-xs italic">
             Powered by the brilliant mind - Stas Shnaider, ITOps genius.
         </div>
-        <div id="start-screen" class="bg-card shadow-2xl rounded-2xl p-10 transition duration-300 border border-slate-700/50">
+        <div id="-screen" class="bg-card shadow-2xl rounded-2xl p-10 transition duration-300 border border-slate-700/50">
             <h2 class="text-2xl font-semibold mb-4 text-primary">Full Name</h2>
             
             <p class="text-text-secondary mb-6">Enter the employee's name to begin the technical assessment. The tool is now fully self-contained and loads questions instantly.</p>
@@ -77,7 +76,7 @@
             <input type="text" id="employee-name-input" placeholder="Enter Employee Full Name (Required)" 
                    class="w-full p-3 mb-6 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none">
 
-            <p id="start-status" class="mt-4 text-center text-sm text-error-text h-5"></p>
+            <p id="-status" class="mt-4 text-center text-sm text-error-text h-5"></p>
 
             <button onclick="checkNameAndStart()" class="btn-primary w-full text-text-light font-semibold py-3 rounded-lg shadow-lg transition duration-200 mt-4">
                 Start Exam
@@ -197,14 +196,39 @@
         };
 
         // DOM Elements
-        const startScreen = document.getElementById('start-screen');
+        const startScreen = document.getElementById('-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const resultsScreen = document.getElementById('results-screen');
-        const startStatus = document.getElementById('start-status');
+        const startStatus = document.getElementById('-status');
         const nextButton = document.getElementById('next-btn');
         const prevButton = document.getElementById('prev-btn');
         const answerInput = document.getElementById('answer-input');
 
+        <script>
+        // (Your entire existing quiz script...)
+    </script>
+
+    <script>
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCVDZPURarcDmSZTsQTUIs_8VxNLQrkSmc",
+        authDomain: "examitops.firebaseapp.com",
+        projectId: "examitops",
+        storageBucket: "examitops.firebasestorage.app",
+        messagingSenderId: "605108026221",
+        appId: "1:605108026221:web:ad7f3147f5645c11cc3864",
+        measurementId: "G-Y70D2ZDQHZ"
+      };
+
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      
+      // Initialize Analytics and Firestore
+      const analytics = firebase.analytics(app);
+      const db = firebase.firestore(app); // This 'db' object is our database!
+
+      console.log("Firebase initialized successfully!");
+    </script>
 
         // --- Start Logic ---
 
@@ -485,16 +509,6 @@
         // --- END OF NEW CODE ---
     }
 
-            const nameElement = document.createElement('p');
-            nameElement.id = 'employee-name-display';
-            nameElement.className = 'text-2xl font-bold text-text-light mb-2';
-            nameElement.textContent = employeeName;
-            scoreDisplayBox.insertBefore(nameElement, scoreDisplayBox.firstElementChild);
-
-            const recapContainer = document.getElementById('recap-container');
-            recapContainer.innerHTML = '';
-        }
-
         function printRecap() {
             const total = questions.length;
             const finalScore = calculateFinalScore(); // Use the calculated score
@@ -620,32 +634,5 @@
             }
         }
     </script>
-
-    <script>
-      // Your web app's Firebase configuration
-      const firebaseConfig = {
-        apiKey: "AIzaSyCVDZPURarcDmSZTsQTUIs_8VxNLQrkSmc",
-        authDomain: "examitops.firebaseapp.com",
-        projectId: "examitops",
-        storageBucket: "examitops.firebasestorage.app",
-        messagingSenderId: "605108026221",
-        appId: "1:605108026221:web:ad7f3147f5645c11cc3864",
-        measurementId: "G-Y70D2ZDQHZ"
-      };
-
-      // Initialize Firebase
-      const app = firebase.initializeApp(firebaseConfig);
-      
-      // Initialize Analytics and Firestore
-      const analytics = firebase.analytics(app);
-      const db = firebase.firestore(app); // This 'db' object is our database!
-
-      console.log("Firebase initialized successfully!");
-    </script>
 </body>
 </html>
-
-
-
-
-
