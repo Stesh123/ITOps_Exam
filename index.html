@@ -203,29 +203,6 @@
 
 
         // --- Start Logic ---
-       <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-analytics.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js"></script>
-
-<script>
-  // --- Firebase Configuration ---
-  const firebaseConfig = {
-    apiKey: "AIzaSyCVDZPURarcDmSZTsQTUIs_8VxNLQrkSmc",
-    authDomain: "examitops.firebaseapp.com",
-    projectId: "examitops",
-    storageBucket: "examitops.firebasestorage.app",
-    messagingSenderId: "605108026221",
-    appId: "1:605108026221:web:ad7f3147f5645c11cc3864",
-    measurementId: "G-Y70D2ZDQHZ"
-  };
-
-  // --- Initialize Firebase ---
-  const app = firebase.initializeApp(firebaseConfig);
-  const analytics = firebase.analytics();
-  const db = firebase.firestore();
-</script>
- 
 
         function checkNameAndStart() {
             const name = document.getElementById('employee-name-input').value.trim();
@@ -439,27 +416,36 @@
             return finalScore;
         }
 
-        async function showResults() {
-  const finalScore = calculateFinalScore();
-  const total = questions.length;
+        function showResults() {
+            // Calculate the final score based on the saved userAnswers array
+            const finalScore = calculateFinalScore();
+            const total = questions.length;
+            
+            // Set the old `score` variable here for compatibility with `printRecap`.
+            score = finalScore;
 
-  // Save to Firestore
-  try {
-    await db.collection("examResults").add({
-      name: employeeName,
-      score: finalScore,
-      total: total,
-      percentage: (finalScore / total) * 100,
-      timestamp: new Date()
-    });
-    console.log("Result saved to Firebase");
-  } catch (e) {
-    console.error("Error saving result:", e);
-  }
+            quizScreen.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
 
-  // existing UI update code...
-}
+            document.getElementById('final-score-display').textContent = `${finalScore}/${total}`;
 
+            // Dynamically insert employee name into the score box
+            const scoreDisplayBox = document.querySelector('#final-score-display').parentNode;
+
+            let existingNameElement = document.getElementById('employee-name-display');
+            if (existingNameElement) {
+                existingNameElement.remove();
+            }
+
+            const nameElement = document.createElement('p');
+            nameElement.id = 'employee-name-display';
+            nameElement.className = 'text-2xl font-bold text-text-light mb-2';
+            nameElement.textContent = employeeName;
+            scoreDisplayBox.insertBefore(nameElement, scoreDisplayBox.firstElementChild);
+
+            const recapContainer = document.getElementById('recap-container');
+            recapContainer.innerHTML = '';
+        }
 
         function printRecap() {
             const total = questions.length;
