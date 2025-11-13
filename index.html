@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-R">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ITOps Exam</title>
     
@@ -56,7 +56,11 @@
              opacity: 0.6;
         }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics-compat.js"></script>
 </head>
+    
 <body class="bg-background text-text-light min-h-screen flex items-center justify-center p-4">
 
     <div id="app" class="w-full max-w-2xl">
@@ -416,26 +420,70 @@
             return finalScore;
         }
 
-        function showResults() {
-            // Calculate the final score based on the saved userAnswers array
-            const finalScore = calculateFinalScore();
-            const total = questions.length;
+        async function showResults() {
+        // Calculate the final score based on the saved userAnswers array
+        const finalScore = calculateFinalScore();
+        const total = questions.length;
+        
+        // Set the old `score` variable here for compatibility with `printRecap`.
+        score = finalScore;
+
+        quizScreen.classList.add('hidden');
+        resultsScreen.classList.remove('hidden');
+
+        document.getElementById('final-score-display').textContent = `${finalScore}/${total}`;
+
+        // (Your existing code to display the employee name...)
+        const scoreDisplayBox = document.querySelector('#final-score-display').parentNode;
+        let existingNameElement = document.getElementById('employee-name-display');
+        if (existingNameElement) {
+            existingNameElement.remove();
+        }
+        const nameElement = document.createElement('p');
+        nameElement.id = 'employee-name-display';
+        nameElement.className = 'text-2xl font-bold text-text-light mb-2';
+        nameElement.textContent = employeeName;
+        scoreDisplayBox.insertBefore(nameElement, scoreDisplayBox.firstElementChild);
+
+        const recapContainer = document.getElementById('recap-container');
+        recapContainer.innerHTML = '';
+
+
+        // --- NEW CODE TO SAVE TO FIREBASE ---
+        try {
+            console.log("Attempting to save results to Firebase...");
+
+            // 1. Create a data object with the results.
+            //    'userAnswers' is the array you already built!
+            const examResult = {
+                name: employeeName,
+                score: finalScore,
+                totalQuestions: total,
+                percentage: total > 0 ? ((finalScore / total) * 100).toFixed(1) : 0,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(), // Adds a server timestamp
+                answers: userAnswers // Saves the entire detailed answer array
+            };
+
+            // 2. Add the data to a Firestore "collection" named "examResults"
+            //    Firestore will automatically create a new document with a unique ID.
+            const docRef = await db.collection("examResults").add(examResult);
             
-            // Set the old `score` variable here for compatibility with `printRecap`.
-            score = finalScore;
+            console.log("Results saved successfully! Document ID: ", docRef.id);
 
-            quizScreen.classList.add('hidden');
-            resultsScreen.classList.remove('hidden');
+            // Optional: Give the user feedback on the results screen
+            const resultsTitle = document.getElementById('results-title');
+            resultsTitle.textContent = "Exam Completed (Results Saved)";
 
-            document.getElementById('final-score-display').textContent = `${finalScore}/${total}`;
-
-            // Dynamically insert employee name into the score box
-            const scoreDisplayBox = document.querySelector('#final-score-display').parentNode;
-
-            let existingNameElement = document.getElementById('employee-name-display');
-            if (existingNameElement) {
-                existingNameElement.remove();
-            }
+        } catch (error) {
+            console.error("Error saving results to Firebase: ", error);
+            
+            // Optional: Show an error to the user
+            const resultsTitle = document.getElementById('results-title');
+            resultsTitle.textContent = "Exam Completed (Save Failed)";
+            resultsTitle.classList.add('text-error-text'); // Use your error color
+        }
+        // --- END OF NEW CODE ---
+    }
 
             const nameElement = document.createElement('p');
             nameElement.id = 'employee-name-display';
@@ -572,6 +620,30 @@
             }
         }
     </script>
+
+    <script>
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyCVDZPURarcDmSZTsQTUIs_8VxNLQrkSmc",
+        authDomain: "examitops.firebaseapp.com",
+        projectId: "examitops",
+        storageBucket: "examitops.firebasestorage.app",
+        messagingSenderId: "605108026221",
+        appId: "1:605108026221:web:ad7f3147f5645c11cc3864",
+        measurementId: "G-Y70D2ZDQHZ"
+      };
+
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      
+      // Initialize Analytics and Firestore
+      const analytics = firebase.analytics(app);
+      const db = firebase.firestore(app); // This 'db' object is our database!
+
+      console.log("Firebase initialized successfully!");
+    </script>
 </body>
 </html>
+
+
 
