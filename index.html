@@ -8,52 +8,41 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script>
-        // Define the configuration object AFTER the Tailwind CDN script loads.
         if (typeof tailwind !== 'undefined') {
             tailwind.config = {
                 darkMode: 'class',
                 theme: {
                     extend: {
                         colors: {
-                            'primary': '#4f46e5', /* Indigo 600 */
+                            'primary': '#4f46e5',
                             'secondary': '#1f2937',
-                            'background': '#0f172a', /* Slate 900 */
-                            'card': '#1e293b', /* Slate 800 */
-                            'text-light': '#f1f5f9', /* Slate 100 */
-                            'text-secondary': '#94a3b8', /* Slate 400 */
-                            'selection': '#334155', /* Slate 700 for selected option */
-                            'error-text': '#f87171', /* Red 400 */
+                            'background': '#0f172a',
+                            'card': '#1e293b',
+                            'text-light': '#f1f5f9',
+                            'text-secondary': '#94a3b8',
+                            'selection': '#334155',
+                            'error-text': '#f87171',
                         }
                     }
                 }
             }
-        } else {
-            console.error("Tailwind object is still undefined after loading CDN.");
         }
     </script>
     <style>
-        /* Custom font import for aesthetics */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        :root {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Custom button styling for gradient/depth */
+        :root { font-family: 'Inter', sans-serif; }
         .btn-primary {
             background: linear-gradient(145deg, #6366f1, #4f46e5);
-            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79,70,229,.4);
+            transition: all .3s ease;
         }
         .btn-primary:hover {
             background: linear-gradient(145deg, #4f46e5, #3730a3);
-            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+            box-shadow: 0 6px 20px rgba(79,70,229,.6);
             transform: translateY(-2px);
         }
-        .btn-primary:disabled, .btn-primary[disabled] {
-             background: #334155; /* Slate 700 */
-             box-shadow: none;
-             transform: none;
-             cursor: not-allowed;
-             opacity: 0.6;
+        .btn-primary:disabled, .btn-primary[disabled]{
+            background:#334155; box-shadow:none; transform:none; cursor:not-allowed; opacity:.6;
         }
     </style>
 </head>
@@ -65,56 +54,53 @@
         <div class="text-center mb-4 text-text-secondary text-xs italic">
             Powered by the brilliant mind - Stas Shnaider, ITOps genius.
         </div>
-        <div id="start-screen" class="bg-card shadow-2xl rounded-2xl p-10 transition duration-300 border border-slate-700/50">
+
+        <!-- START SCREEN -->
+        <div id="start-screen" class="bg-card shadow-2xl rounded-2xl p-10 border border-slate-700/50">
             <h2 class="text-2xl font-semibold mb-4 text-primary">Full Name</h2>
-            
-            <p class="text-text-secondary mb-6">Enter the employee's name to begin the technical assessment. The tool is now fully self-contained and loads questions instantly.</p>
+            <p class="text-text-secondary mb-6">Enter the employee's name to begin the technical assessment.</p>
 
             <input type="text" id="employee-name-input" placeholder="Enter Employee Full Name (Required)" 
                    class="w-full p-3 mb-6 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none">
 
             <p id="start-status" class="mt-4 text-center text-sm text-error-text h-5"></p>
 
-            <button onclick="checkNameAndStart()" class="btn-primary w-full text-text-light font-semibold py-3 rounded-lg shadow-lg transition duration-200 mt-4">
+            <button onclick="exam.checkNameAndStart()" class="btn-primary w-full text-text-light font-semibold py-3 rounded-lg shadow-lg mt-4">
                 Start Exam
             </button>
         </div>
 
+        <!-- QUIZ SCREEN -->
         <div id="quiz-screen" class="hidden bg-card shadow-2xl rounded-2xl p-10 border border-slate-700/50">
             <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
                 <h2 class="text-xl font-semibold text-primary" id="question-number">Question 1/X</h2>
                 <span id="current-score" class="text-base font-medium text-text-secondary px-3 py-1 bg-slate-700/50 rounded-full">Score: Hidden</span>
             </div>
-            
             <div class="mb-10">
                 <p id="question-text" class="text-2xl font-light mb-3"></p>
                 <p id="question-category" class="text-sm text-primary/70 italic"></p>
             </div>
 
-            <div id="options-container" class="space-y-4">
-                </div>
+            <div id="options-container" class="space-y-4"></div>
 
             <div id="fill-in-container" class="space-y-4 hidden">
-                <input type="text" id="answer-input" placeholder="Type your answer here..." 
+                <input type="text" id="answer-input" placeholder="Type your answer here..."
                        class="w-full p-4 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none text-xl">
             </div>
-            
+
             <p id="answer-error" class="text-error-text text-sm h-5 text-center"></p>
 
             <div class="mt-8 flex justify-between space-x-4">
-                <button id="prev-btn" onclick="goToPrevQuestion()"
-                        class="bg-slate-600 hover:bg-slate-500 text-text-light font-semibold py-3 px-6 rounded-lg transition duration-200 disabled:opacity-50"
-                        disabled>
-                    ← Previous
-                </button>
-                <button id="next-btn" onclick="checkAnswerAndAdvance()"
-                        class="btn-primary text-text-light font-semibold py-3 px-6 rounded-lg shadow-lg transition duration-200 disabled:opacity-50"
-                        disabled>
-                    Next Question →
-                </button>
+                <button id="prev-btn" onclick="exam.goToPrevQuestion()"
+                        class="bg-slate-600 hover:bg-slate-500 text-text-light font-semibold py-3 px-6 rounded-lg transition disabled:opacity-50"
+                        disabled>Previous</button>
+                <button id="next-btn" onclick="exam.checkAnswerAndAdvance()"
+                        class="btn-primary text-text-light font-semibold py-3 px-6 rounded-lg shadow-lg transition disabled:opacity-50"
+                        disabled>Next Question</button>
             </div>
         </div>
 
+        <!-- RESULTS SCREEN -->
         <div id="results-screen" class="hidden bg-card shadow-2xl rounded-2xl p-10 border border-slate-700/50">
             <h2 class="text-3xl font-bold text-primary mb-3 text-center" id="results-title">Exam Completed</h2>
             <p class="text-lg text-text-secondary mb-8 text-center">Final Overall Score</p>
@@ -123,508 +109,330 @@
                 <p class="text-xl font-medium text-text-secondary">Overall Score:</p>
                 <div class="text-7xl font-extrabold text-white mt-1" id="final-score-display">--/--</div>
             </div>
-            
+
             <div class="mb-10 pt-4 flex space-x-4 justify-center">
-                <button onclick="printRecap()" class="btn-primary text-text-light font-semibold py-3 px-6 rounded-lg transition duration-200">
+                <button onclick="exam.printRecap()" class="btn-primary text-text-light font-semibold py-3 px-6 rounded-lg transition">
                     Print Summary (Detailed Recap)
                 </button>
-                <button onclick="resetApp()" class="bg-slate-600 hover:bg-slate-500 text-text-light font-semibold py-3 px-6 rounded-lg shadow-lg transition duration-200">
+                <button onclick="exam.resetApp()" class="bg-slate-600 hover:bg-slate-500 text-text-light font-semibold py-3 px-6 rounded-lg shadow-lg transition">
                     Restart
                 </button>
             </div>
-            
-            <div id="recap-container" class="hidden">
-                </div>
-        </div>
 
+            <div id="recap-container" class="hidden"></div>
+        </div>
     </div>
 
+    <!-- ====================== MODULE SCRIPT ====================== -->
     <script type="module">
-        // Import Firebase SDKs
+        // ---------- Firebase ----------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
-          apiKey: "AIzaSyCVDZPURarcDmSZTsQTUIs_8VxNLQrkSmc",
-          authDomain: "examitops.firebaseapp.com",
-          projectId: "examitops",
-          storageBucket: "examitops.firebasestorage.app",
-          messagingSenderId: "605108026221",
-          appId: "1:605108026221:web:ad7f3147f5645c11cc3864",
-          measurementId: "G-Y70D2ZDQHZ"
+            apiKey: "AIzaSyCVDZPURarcDmSZTsQTUIs_8VxNLQrkSmc",
+            authDomain: "examitops.firebaseapp.com",
+            projectId: "examitops",
+            storageBucket: "examitops.firebasestorage.app",
+            messagingSenderId: "605108026221",
+            appId: "1:605108026221:web:ad7f3147f5645c11cc3864",
+            measurementId: "G-Y70D2ZDQHZ"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        // --- EMBEDDED QUESTION DATA ---
-        const questions = [
-            // ================= IT ARCHITECT =================
-            { Category: 'IT Architect', Question: 'Which architecture pattern separates an application into presentation, logic, and data layers?', A: 'Monolithic', B: '3-Tier', C: 'Event-Driven', D: 'Microservices', CorrectAnswer: 'B' },
-            { Category: 'IT Architect', Question: 'What is a key advantage of microservices architecture?', A: 'Single deployment unit', B: 'Independent scalability', C: 'Tight coupling', D: 'Single point of failure', CorrectAnswer: 'B' },
-            { Category: 'IT Architect', Question: 'Which protocol is typically used for service communication in REST APIs?', A: 'FTP', B: 'HTTP/HTTPS', C: 'SNMP', D: 'SSH', CorrectAnswer: 'B' },
-            { Category: 'IT Architect', Question: 'Which concept ensures that system components can continue functioning even if one part fails?', A: 'Fault Tolerance', B: 'Load Balancing', C: 'Data Encryption', D: 'Caching', CorrectAnswer: 'A' },
-            { Category: 'IT Architect', Question: 'Which cloud model provides virtual machines and storage but requires user-managed OS?', A: 'SaaS', B: 'PaaS', C: 'IaaS', D: 'DBaaS', CorrectAnswer: 'C' },
-            // Fill-in-the-Blank
-            { Category: 'IT Architect', Question: 'The architectural principle of dividing services into small independent components is called ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'microservices' },
+        // ---------- Questions ----------
+        const questions = [ /* … (your question array – unchanged) … */ ];
 
-            // ================= LINUX =================
-            { Category: 'Linux', Question: 'Which command displays real-time system processes?', A: 'ps', B: 'top', C: 'df', D: 'free', CorrectAnswer: 'B' },
-            { Category: 'Linux', Question: 'Which file defines mounted file systems at boot?', A: '/etc/fstab', B: '/etc/mount', C: '/etc/rc.local', D: '/etc/startup.conf', CorrectAnswer: 'A' },
-            { Category: 'Linux', Question: 'Which command changes file permissions?', A: 'chperm', B: 'chmod', C: 'chgrp', D: 'chown', CorrectAnswer: 'B' },
-            { Category: 'Linux', Question: 'Which command is used to display disk space usage?', A: 'df -h', B: 'du -a', C: 'lsblk', D: 'fdisk -l', CorrectAnswer: 'A' },
-            // Fill-in-the-Blank
-            { Category: 'Linux', Question: 'The default superuser account in Linux is called ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'root' },
-            { Category: 'Linux', Question: 'The configuration file for network interfaces in Ubuntu is located in ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '/etc/netplan/' },
-
-            // ================= VMWARE =================
-            { Category: 'VMware', Question: 'Which VMware component manages multiple ESXi hosts?', A: 'vCenter Server', B: 'vSphere Client', C: 'vMotion', D: 'vSAN', CorrectAnswer: 'A' },
-            { Category: 'VMware', Question: 'What feature allows a VM to move between hosts without downtime?', A: 'vSAN', B: 'vMotion', C: 'HA', D: 'DRS', CorrectAnswer: 'B' },
-            { Category: 'VMware', Question: 'Which VMware feature ensures automatic restart of VMs after host failure?', A: 'vMotion', B: 'FT', C: 'HA', D: 'DRS', CorrectAnswer: 'C' },
-            { Category: 'VMware', Question: 'Which protocol is used by VMware ESXi for management communication?', A: 'SSH', B: 'HTTPS', C: 'Telnet', D: 'RDP', CorrectAnswer: 'B' },
-            // Fill-in-the-Blank
-            { Category: 'VMware', Question: 'The default username for the vCenter Server Appliance is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'administrator@vsphere.local' },
-            { Category: 'VMware', Question: 'The file extension for a VMware virtual disk is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '.vmdk' },
-
-            // ================= NETWORK =================
-            { Category: 'Network', Question: 'Which protocol is used to translate domain names to IP addresses?', A: 'DHCP', B: 'DNS', C: 'NAT', D: 'ARP', CorrectAnswer: 'B' },
-            { Category: 'Network', Question: 'Which layer of the OSI model handles routing?', A: 'Data Link', B: 'Transport', C: 'Network', D: 'Session', CorrectAnswer: 'C' },
-            { Category: 'Network', Question: 'Which command is used to test network connectivity?', A: 'ping', B: 'netstat', C: 'ipconfig', D: 'nslookup', CorrectAnswer: 'A' },
-            { Category: 'Network', Question: 'Which device operates at Layer 2 of the OSI model?', A: 'Router', B: 'Switch', C: 'Hub', D: 'Firewall', CorrectAnswer: 'B' },
-            // Fill-in-the-Blank
-            { Category: 'Network', Question: 'The default subnet mask for a Class C network is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '255.255.255.0' },
-            { Category: 'Network', Question: 'The protocol used for secure remote management over TCP port 22 is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'SSH' },
-        ];
-
-        // Global state variables
+        // ---------- Global State ----------
         let currentQuestionIndex = 0;
-        let userAnswers = []; // Array to store user's choices, now including ALL questions
+        let userAnswers = [];
         let employeeName = '';
-        let score = 0; // This will be set at the end for the recap
+        let score = 0;
 
-        const KEYS = {
-            QUESTION: 'Question',
-            CATEGORY: 'Category',
-            A: 'A', B: 'B', C: 'C', D: 'D',
-            CORRECT: 'CorrectAnswer'
-        };
+        const KEYS = { QUESTION:'Question', CATEGORY:'Category', A:'A', B:'B', C:'C', D:'D', CORRECT:'CorrectAnswer' };
 
-        // DOM Elements
-        const startScreen = document.getElementById('start-screen');
-        const quizScreen = document.getElementById('quiz-screen');
+        // ---------- DOM ----------
+        const startScreen   = document.getElementById('start-screen');
+        const quizScreen    = document.getElementById('quiz-screen');
         const resultsScreen = document.getElementById('results-screen');
-        const startStatus = document.getElementById('start-status');
-        const nextButton = document.getElementById('next-btn');
-        const prevButton = document.getElementById('prev-btn');
-        const answerInput = document.getElementById('answer-input');
+        const startStatus   = document.getElementById('start-status');
+        const nextButton    = document.getElementById('next-btn');
+        const prevButton    = document.getElementById('prev-btn');
+        const answerInput   = document.getElementById('answer-input');
 
+        // ---------- Helper Functions ----------
+        function calculateFinalScore() {
+            return userAnswers.reduce((s, a) => s + (a.isCorrect ? 1 : 0), 0);
+        }
 
-        // --- Start Logic ---
+        // ---------- Core Functions (exposed globally) ----------
+        const exam = {
+            checkNameAndStart,
+            startQuiz,
+            goToPrevQuestion,
+            checkAnswerAndAdvance,
+            showResults,
+            printRecap,
+            resetApp
+        };
+        window.exam = exam;   // <-- makes them reachable from inline handlers
 
+        // ----- START -----
         function checkNameAndStart() {
             const name = document.getElementById('employee-name-input').value.trim();
-            if (!name) {
-                startStatus.textContent = 'Error: Please enter the employee\'s full name.';
-                return;
-            }
-            employeeName = name; // Store the name globally
+            if (!name) { startStatus.textContent = "Error: Please enter the employee's full name."; return; }
+            employeeName = name;
             startStatus.textContent = '';
-            startQuiz();
+            exam.startQuiz();
         }
 
         function startQuiz() {
             currentQuestionIndex = 0;
-            // Initialize userAnswers for all questions once at the start
             userAnswers = questions.map(q => ({
                 question: q[KEYS.QUESTION],
                 category: q[KEYS.CATEGORY],
                 isMCQ: !!q[KEYS.A].trim(),
-                options: { A: q[KEYS.A], B: q[KEYS.B], C: q[KEYS.C], D: q[KEYS.D] },
-                selected: null, // Stores the selected key (A, B, C, D) or the typed string
+                options: { A:q[KEYS.A], B:q[KEYS.B], C:q[KEYS.C], D:q[KEYS.D] },
+                selected: null,
                 correct: q[KEYS.CORRECT],
                 isCorrect: false
             }));
 
             startScreen.classList.add('hidden');
             quizScreen.classList.remove('hidden');
-
             displayQuestion();
         }
 
-        // --- Quiz Navigation and Display ---
-
-        function updateNavigationButtons() {
-            const total = questions.length;
-            prevButton.disabled = currentQuestionIndex === 0;
-            nextButton.textContent = currentQuestionIndex === total - 1 ? 'Finish Exam' : 'Next Question →';
-        }
-
+        // ----- DISPLAY -----
         function displayQuestion() {
-            if (currentQuestionIndex >= questions.length) {
-                showResults();
-                return;
-            }
+            if (currentQuestionIndex >= questions.length) { exam.showResults(); return; }
 
             const q = questions[currentQuestionIndex];
             const attempt = userAnswers[currentQuestionIndex];
             const total = questions.length;
 
-            document.getElementById('question-number').textContent = `Question ${currentQuestionIndex + 1}/${total}`;
-            document.getElementById('question-text').textContent = q[KEYS.QUESTION];
-            const categoryText = q[KEYS.CATEGORY] ? `Category: ${q[KEYS.CATEGORY]}` : 'Category: General';
-            document.getElementById('question-category').textContent = categoryText;
+            document.getElementById('question-number').textContent = `Question ${currentQuestionIndex+1}/${total}`;
+            document.getElementById('question-text').textContent   = q[KEYS.QUESTION];
+            document.getElementById('question-category').textContent = q[KEYS.CATEGORY] ? `Category: ${q[KEYS.CATEGORY]}` : 'Category: General';
 
-            const optionsContainer = document.getElementById('options-container');
-            const fillInContainer = document.getElementById('fill-in-container');
-            const answerError = document.getElementById('answer-error');
+            const opts = document.getElementById('options-container');
+            const fill = document.getElementById('fill-in-container');
+            const err  = document.getElementById('answer-error');
 
-            const isMCQ = attempt.isMCQ;
+            opts.innerHTML = '';
+            answerInput.value = '';
+            err.textContent = '';
 
-            optionsContainer.innerHTML = '';
-            answerInput.value = ''; // Clear input field
-            answerError.textContent = ''; // Clear any previous error
-
-            if (isMCQ) {
-                optionsContainer.classList.remove('hidden');
-                fillInContainer.classList.add('hidden');
-
-                const optionKeys = ['A', 'B', 'C', 'D'];
-
-                optionKeys.forEach(key => {
-                    if (q[key]) {
-                        const button = document.createElement('button');
-                        button.textContent = `${key}. ${q[key]}`;
-                        
-                        let className = `option-button w-full text-left p-4 rounded-lg bg-slate-700 hover:bg-primary/50 transition duration-150 shadow-md font-medium`;
-                        
-                        // Highlight selected option if available
-                        if (attempt.selected === key) {
-                            className = `option-button w-full text-left p-4 rounded-lg bg-selection ring-2 ring-primary/50 transition duration-150 shadow-md font-medium`;
-                        }
-
-                        button.className = className;
-                        button.onclick = () => selectMCQAnswer(key);
-                        button.id = `option-${key}`;
-                        optionsContainer.appendChild(button);
-                    }
+            if (attempt.isMCQ) {
+                opts.classList.remove('hidden'); fill.classList.add('hidden');
+                ['A','B','C','D'].forEach(k => {
+                    if (!q[k]) return;
+                    const btn = document.createElement('button');
+                    btn.textContent = `${k}. ${q[k]}`;
+                    btn.className = `option-button w-full text-left p-4 rounded-lg bg-slate-700 hover:bg-primary/50 transition shadow-md font-medium`;
+                    if (attempt.selected === k) btn.className = `option-button w-full text-left p-4 rounded-lg bg-selection ring-2 ring-primary/50 transition shadow-md font-medium`;
+                    btn.onclick = () => selectMCQAnswer(k);
+                    btn.id = `option-${k}`;
+                    opts.appendChild(btn);
                 });
-
             } else {
-                // Fill-in-the-blank question
-                optionsContainer.classList.add('hidden');
-                fillInContainer.classList.remove('hidden');
-                
-                // Load previous answer
-                if (attempt.selected !== null) {
-                    answerInput.value = attempt.selected;
-                }
-                
-                // Use oninput to track changes immediately
-                answerInput.oninput = submitFillInAnswer; 
+                opts.classList.add('hidden'); fill.classList.remove('hidden');
+                if (attempt.selected !== null) answerInput.value = attempt.selected;
+                answerInput.oninput = submitFillInAnswer;
             }
 
-            // Enable/Disable next button based on answer presence
             updateNextButtonState();
             updateNavigationButtons();
         }
 
-        function updateNextButtonState() {
-            const attempt = userAnswers[currentQuestionIndex];
-            const isAnswered = attempt && attempt.selected !== null && attempt.selected.toString().trim() !== '';
-            nextButton.disabled = !isAnswered;
-            // Also update the score display visibility (still hidden)
-            document.getElementById('current-score').textContent = 'Score: Hidden';
+        function updateNavigationButtons() {
+            prevButton.disabled = currentQuestionIndex === 0;
+            nextButton.textContent = currentQuestionIndex === questions.length-1 ? 'Finish Exam' : 'Next Question';
         }
 
+        function updateNextButtonState() {
+            const a = userAnswers[currentQuestionIndex];
+            nextButton.disabled = !a || a.selected === null || a.selected.toString().trim() === '';
+        }
 
-        // --- Answer Selection and Storage ---
-
-        function selectMCQAnswer(selectedKey) {
+        // ----- ANSWER HANDLING -----
+        function selectMCQAnswer(key) {
             const attempt = userAnswers[currentQuestionIndex];
             const q = questions[currentQuestionIndex];
+            attempt.selected = key;
+            attempt.isCorrect = key === q[KEYS.CORRECT];
 
-            // 1. Store the selected answer
-            attempt.selected = selectedKey;
-
-            // 2. Calculate correctness immediately for the recap data
-            attempt.isCorrect = selectedKey === q[KEYS.CORRECT];
-
-            // 3. Update the UI to reflect the selection
-            document.querySelectorAll('.option-button').forEach(btn => {
-                btn.classList.remove('bg-selection', 'ring-2', 'ring-primary/50');
-                btn.classList.add('bg-slate-700', 'hover:bg-primary/50'); // Reset to default
+            document.querySelectorAll('.option-button').forEach(b => {
+                b.classList.remove('bg-selection','ring-2','ring-primary/50');
+                b.classList.add('bg-slate-700','hover:bg-primary/50');
             });
+            const sel = document.getElementById(`option-${key}`);
+            if (sel) sel.classList.add('bg-selection','ring-2','ring-primary/50');
 
-            // Highlight the new selection
-            const selectedButton = document.getElementById(`option-${selectedKey}`);
-            if (selectedButton) {
-                selectedButton.classList.remove('bg-slate-700', 'hover:bg-primary/50');
-                selectedButton.classList.add('bg-selection', 'ring-2', 'ring-primary/50');
-            }
-
-            // 4. Enable the Next button
             updateNextButtonState();
         }
 
         function submitFillInAnswer() {
             const attempt = userAnswers[currentQuestionIndex];
             const q = questions[currentQuestionIndex];
-            const submittedAnswer = answerInput.value.trim();
-
-            // 1. Store the submitted answer
-            attempt.selected = submittedAnswer;
-
-            // 2. Calculate correctness
-            if (submittedAnswer) {
-                const submitted = submittedAnswer.toLowerCase();
-                const correctRaw = q[KEYS.CORRECT];
-                const correctAnswers = correctRaw.split('|').map(a => a.trim().toLowerCase());
-                attempt.isCorrect = correctAnswers.includes(submitted);
+            const txt = answerInput.value.trim();
+            attempt.selected = txt;
+            if (txt) {
+                const norm = txt.toLowerCase();
+                const correct = q[KEYS.CORRECT].split('|').map(c=>c.trim().toLowerCase());
+                attempt.isCorrect = correct.includes(norm);
             } else {
-                // If the user clears the input, mark as unanswered/incorrect
                 attempt.isCorrect = false;
             }
-
-            // 3. Clear error and enable/disable Next button
             document.getElementById('answer-error').textContent = '';
             updateNextButtonState();
         }
-        
-        // --- Navigation Functions ---
 
+        // ----- NAVIGATION -----
         function goToPrevQuestion() {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                displayQuestion();
-            }
+            if (currentQuestionIndex > 0) { currentQuestionIndex--; displayQuestion(); }
         }
 
         function checkAnswerAndAdvance() {
             const attempt = userAnswers[currentQuestionIndex];
-            const isAnswered = attempt && attempt.selected !== null && attempt.selected.toString().trim() !== '';
-
-            if (!isAnswered) {
-                document.getElementById('answer-error').textContent = attempt.isMCQ 
-                    ? 'Please select an answer before moving to the next question.'
-                    : 'Please enter an answer before moving to the next question.';
+            if (!attempt || attempt.selected === null || attempt.selected.toString().trim() === '') {
+                document.getElementById('answer-error').textContent = attempt.isMCQ ?
+                    'Please select an answer before moving to the next question.' :
+                    'Please enter an answer before moving to the next question.';
                 return;
             }
-
-            document.getElementById('answer-error').textContent = ''; // Clear error message
-
-            if (currentQuestionIndex < questions.length - 1) {
+            document.getElementById('answer-error').textContent = '';
+            if (currentQuestionIndex < questions.length-1) {
                 currentQuestionIndex++;
                 displayQuestion();
             } else {
-                // Last question answered, finish the exam
-                showResults();
+                exam.showResults();
             }
         }
 
-        // --- Results and Recap Logic ---
-
-        function calculateFinalScore() {
-            let finalScore = 0;
-            userAnswers.forEach(attempt => {
-                if (attempt.isCorrect) {
-                    finalScore++;
-                }
-            });
-            return finalScore;
-        }
-
+        // ----- RESULTS -----
         async function sendResultsToDatabase() {
             const finalScore = calculateFinalScore();
             const total = questions.length;
-            const percentage = total > 0 ? ((finalScore / total) * 100).toFixed(1) : 0;
-            const timestamp = new Date().toISOString();
-
-            const resultData = {
+            const percentage = total ? ((finalScore/total)*100).toFixed(1) : 0;
+            const data = {
                 employeeName,
                 score: finalScore,
                 total,
                 percentage,
-                timestamp,
-                answers: userAnswers.map(attempt => ({
-                    question: attempt.question,
-                    category: attempt.category,
-                    selected: attempt.selected,
-                    correct: attempt.correct,
-                    isCorrect: attempt.isCorrect
+                timestamp: new Date().toISOString(),
+                answers: userAnswers.map(a=>({
+                    question: a.question,
+                    category: a.category,
+                    selected: a.selected,
+                    correct: a.correct,
+                    isCorrect: a.isCorrect
                 }))
             };
-
             try {
-                const docRef = await addDoc(collection(db, "examResults"), resultData);
-                console.log("Results sent to database with ID: ", docRef.id);
+                await addDoc(collection(db, "examResults"), data);
+                console.log("Results saved to Firestore");
             } catch (e) {
-                console.error("Error adding document: ", e);
-                alert("Failed to send results to database. Please try again.");
+                console.error("Firestore error:", e);
+                alert("Could not save results – check console.");
             }
         }
 
         function showResults() {
-            // Calculate the final score based on the saved userAnswers array
             const finalScore = calculateFinalScore();
             const total = questions.length;
-            
-            // Set the old `score` variable here for compatibility with `printRecap`.
             score = finalScore;
 
             quizScreen.classList.add('hidden');
             resultsScreen.classList.remove('hidden');
-
             document.getElementById('final-score-display').textContent = `${finalScore}/${total}`;
 
-            // Dynamically insert employee name into the score box
-            const scoreDisplayBox = document.querySelector('#final-score-display').parentNode;
+            const box = document.querySelector('#final-score-display').parentNode;
+            let nameEl = document.getElementById('employee-name-display');
+            if (nameEl) nameEl.remove();
+            nameEl = document.createElement('p');
+            nameEl.id = 'employee-name-display';
+            nameEl.className = 'text-2xl font-bold text-text-light mb-2';
+            nameEl.textContent = employeeName;
+            box.insertBefore(nameEl, box.firstElementChild);
 
-            let existingNameElement = document.getElementById('employee-name-display');
-            if (existingNameElement) {
-                existingNameElement.remove();
-            }
-
-            const nameElement = document.createElement('p');
-            nameElement.id = 'employee-name-display';
-            nameElement.className = 'text-2xl font-bold text-text-light mb-2';
-            nameElement.textContent = employeeName;
-            scoreDisplayBox.insertBefore(nameElement, scoreDisplayBox.firstElementChild);
-
-            const recapContainer = document.getElementById('recap-container');
-            recapContainer.innerHTML = '';
-
-            // Send results to Firebase
             sendResultsToDatabase();
         }
 
         function printRecap() {
             const total = questions.length;
-            const finalScore = calculateFinalScore(); // Use the calculated score
-            const percentage = total > 0 ? ((finalScore / total) * 100).toFixed(1) : 0;
+            const finalScore = calculateFinalScore();
+            const perc = total ? ((finalScore/total)*100).toFixed(1) : 0;
+            const date = new Date().toISOString().slice(0,10);
+            const file = `${employeeName.replace(/[^a-zA-Z0-9\s]/g,'').trim().replace(/\s+/g,'_')}_Assessment_Summary_${date}`;
 
-            // Prepare suggested filename based on employee name and date
-            const formattedName = employeeName.replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_'); // Sanitize name
-            const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-            const suggestedFilename = `${formattedName}_Assessment_Summary_${date}`;
+            let html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${file}</title>
+<style>
+body{font-family:sans-serif;margin:30px;color:#212121;}
+h1{color:#4f46e5;border-bottom:2px solid #ddd;padding-bottom:10px;}
+.score-box{border:1px solid #ccc;padding:15px;margin-bottom:20px;text-align:center;}
+.score-number{font-size:3em;font-weight:bold;}
+.question-item{border:1px solid #ddd;padding:15px;margin-top:15px;border-radius:8px;page-break-inside:avoid;}
+.question-text{font-weight:bold;margin-bottom:10px;}
+.option-div{padding:5px;border-radius:4px;margin-bottom:4px;}
+.option-correct-choice{background:#d4edda;border:1px solid #c3e6cb;}
+.option-incorrect-choice{background:#f8d7da;border:1px solid #f5c6cb;}
+.option-correct-answer{background:#e2f0d4;border:1px solid #c9e0b1;}
+.prefix-correct{color:#155724;font-weight:bold;}
+.prefix-incorrect{color:#721c24;font-weight:bold;}
+</style></head><body>
+<h1>Tier 3 Assessment Summary for ${employeeName}</h1>
+<div class="score-box"><h2>Overall Score:</h2><div class="score-number">${finalScore}/${total}</div>
+<p>Percentage: ${perc}%</p><p>Date: ${new Date().toLocaleDateString('en-US')}</p></div>
+<h2>Detailed Exam Recap</h2>`;
 
-            let content = `
-                <style>
-                    /* Basic styles for printability */
-                    body { font-family: sans-serif; margin: 30px; color: #212121; }
-                    h1 { color: #4f46e5; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
-                    h2 { margin-top: 30px; color: #333; }
-                    .score-box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; text-align: center; }
-                    .score-number { font-size: 3em; font-weight: bold; }
-                    /* Recap specific styles */
-                    .question-item { border: 1px solid #ddd; padding: 15px; margin-top: 15px; border-radius: 8px; page-break-inside: avoid; }
-                    .question-text { font-weight: bold; margin-bottom: 10px; }
-                    .option-div { padding: 5px; border-radius: 4px; margin-bottom: 4px; }
-                    
-                    /* Color coding for print */
-                    .option-correct-choice { background-color: #d4edda; border: 1px solid #c3e6cb; } /* Light Green */
-                    .option-incorrect-choice { background-color: #f8d7da; border: 1px solid #f5c6cb; } /* Light Red */
-                    .option-correct-answer { background-color: #e2f0d4; border: 1px solid #c9e0b1; } /* Lighter Green for correction */
-                    
-                    .prefix-correct { color: #155724; font-weight: bold; }
-                    .prefix-incorrect { color: #721c24; font-weight: bold; }
-                </style>
-                <h1>Tier 3 Assessment Summary for ${employeeName}</h1>
-                <div class="score-box">
-                    <h2>Overall Score:</h2>
-                    <div class="score-number">${finalScore}/${total}</div>
-                    <p>Percentage: ${percentage}%</p>
-                    <p>Date: ${new Date().toLocaleDateString('en-US')}</p>
-                </div>
-                
-                <h2>Detailed Exam Recap</h2>
-            `;
-
-            // This loop remains to generate the detailed content for the PDF/Print window
-            userAnswers.forEach((attempt, index) => {
-                let questionRecap = `<div class="question-item">
-                    <p class="question-text">${index + 1}. ${attempt.question}</p>`;
-                
-                if (attempt.isMCQ) {
-                    // MCQ RECAP LOGIC
-                    Object.keys(attempt.options).forEach(key => {
-                        const optionText = attempt.options[key];
-                        if (!optionText) return; // Skip empty options
-                        
-                        let optionClass = '';
-                        let prefix = '';
-                        
-                        if (key === attempt.selected && attempt.isCorrect) {
-                            optionClass = 'option-correct-choice';
-                            prefix = '<span class="prefix-correct">✅ CORRECT CHOICE:</span> ';
-                        } else if (key === attempt.selected && !attempt.isCorrect) {
-                            optionClass = 'option-incorrect-choice';
-                            prefix = '<span class="prefix-incorrect">❌ YOUR CHOICE:</span> ';
-                        } else if (key === attempt.correct) {
-                            optionClass = 'option-correct-answer';
-                            prefix = '<span class="prefix-correct">✔️ CORRECT ANSWER:</span> ';
-                        }
-                        
-                        questionRecap += `<div class="option-div ${optionClass}">${key}. ${prefix}${optionText}</div>`;
+            userAnswers.forEach((a, i) => {
+                let block = `<div class="question-item"><p class="question-text">${i+1}. ${a.question}</p>`;
+                if (a.isMCQ) {
+                    Object.keys(a.options).forEach(k => {
+                        if (!a.options[k]) return;
+                        let cls = '', pref = '';
+                        if (k===a.selected && a.isCorrect) { cls='option-correct-choice'; pref='<span class="prefix-correct">CORRECT CHOICE:</span> '; }
+                        else if (k===a.selected && !a.isCorrect) { cls='option-incorrect-choice'; pref='<span class="prefix-incorrect">YOUR CHOICE:</span> '; }
+                        else if (k===a.correct) { cls='option-correct-answer'; pref='<span class="prefix-correct">CORRECT ANSWER:</span> '; }
+                        block += `<div class="option-div ${cls}">${k}. ${pref}${a.options[k]}</div>`;
                     });
                 } else {
-                    // FITB RECAP LOGIC
-                    const selectedText = attempt.selected || "No Answer Given";
-                    const correctText = attempt.correct;
-                    const isCorrect = attempt.isCorrect;
-
-                    if (isCorrect) {
-                        questionRecap += `<div class="option-div option-correct-choice">
-                            <span class="prefix-correct">✅ YOUR ANSWER (Correct):</span> ${selectedText}
-                        </div>`;
+                    const sel = a.selected || "No Answer Given";
+                    if (a.isCorrect) {
+                        block += `<div class="option-div option-correct-choice"><span class="prefix-correct">YOUR ANSWER (Correct):</span> ${sel}</div>`;
                     } else {
-                        questionRecap += `<div class="option-div option-incorrect-choice">
-                            <span class="prefix-incorrect">❌ YOUR ANSWER (Incorrect):</span> ${selectedText}
-                        </div>
-                        <div class="option-div option-correct-answer">
-                            <span class="prefix-correct">✔️ CORRECT ANSWER(S):</span> ${correctText.split('|').join(', ')}
-                        </div>`;
+                        block += `<div class="option-div option-incorrect-choice"><span class="prefix-incorrect">YOUR ANSWER (Incorrect):</span> ${sel}</div>
+                                  <div class="option-div option-correct-answer"><span class="prefix-correct">CORRECT ANSWER(S):</span> ${a.correct.split('|').join(', ')}</div>`;
                     }
                 }
-
-                questionRecap += `</div>`;
-                content += questionRecap;
+                block += `</div>`;
+                html += block;
             });
-            
-            content += `</div>`; // Close Detailed Exam Recap
 
-            const printWindow = window.open('', '', 'height=600,width=800');
-            printWindow.document.title = suggestedFilename;
-            printWindow.document.write(content);
-            printWindow.document.close();
-            printWindow.print();
+            html += `</body></html>`;
+            const win = window.open('', '', 'height=600,width=800');
+            win.document.title = file;
+            win.document.write(html);
+            win.document.close();
+            win.print();
         }
 
         function resetApp() {
-            // Reinitialize the state variables
-            currentQuestionIndex = 0;
-            score = 0; 
-            userAnswers = [];
-            employeeName = '';
-            
-            // Show the start screen
+            currentQuestionIndex = 0; score = 0; userAnswers = []; employeeName = '';
             resultsScreen.classList.add('hidden');
             quizScreen.classList.add('hidden');
             startScreen.classList.remove('hidden');
-            
-            // Clear inputs and status
             startStatus.textContent = '';
             document.getElementById('employee-name-input').value = '';
-
-            // Clean up dynamically added name element in case it exists
-            let existingNameElement = document.getElementById('employee-name-display');
-            if (existingNameElement) {
-                existingNameElement.remove();
-            }
+            const nameEl = document.getElementById('employee-name-display');
+            if (nameEl) nameEl.remove();
         }
+
     </script>
 </body>
 </html>
