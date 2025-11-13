@@ -69,7 +69,7 @@
         <div class="text-center mb-4 text-text-secondary text-xs italic">
             Powered by the brilliant mind - Stas Shnaider, ITOps genius.
         </div>
-        <div id="-screen" class="bg-card shadow-2xl rounded-2xl p-10 transition duration-300 border border-slate-700/50">
+        <div id="start-screen" class="bg-card shadow-2xl rounded-2xl p-10 transition duration-300 border border-slate-700/50">
             <h2 class="text-2xl font-semibold mb-4 text-primary">Full Name</h2>
             
             <p class="text-text-secondary mb-6">Enter the employee's name to begin the technical assessment. The tool is now fully self-contained and loads questions instantly.</p>
@@ -77,7 +77,7 @@
             <input type="text" id="employee-name-input" placeholder="Enter Employee Full Name (Required)" 
                    class="w-full p-3 mb-6 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none">
 
-            <p id="-status" class="mt-4 text-center text-sm text-error-text h-5"></p>
+            <p id="start-status" class="mt-4 text-center text-sm text-error-text h-5"></p>
 
             <button onclick="checkNameAndStart()" class="btn-primary w-full text-text-light font-semibold py-3 rounded-lg shadow-lg transition duration-200 mt-4">
                 Start Exam
@@ -197,10 +197,10 @@
         };
 
         // DOM Elements
-        const startScreen = document.getElementById('-screen');
+        const startScreen = document.getElementById('start-screen');
         const quizScreen = document.getElementById('quiz-screen');
         const resultsScreen = document.getElementById('results-screen');
-        const startStatus = document.getElementById('-status');
+        const startStatus = document.getElementById('start-status');
         const nextButton = document.getElementById('next-btn');
         const prevButton = document.getElementById('prev-btn');
         const answerInput = document.getElementById('answer-input');
@@ -644,6 +644,7 @@
     </script>
 </body>
 </html>
+
 
 
 
