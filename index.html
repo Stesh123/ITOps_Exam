@@ -147,36 +147,32 @@
         // ---------- ALL 24 QUESTIONS (FULLY RESTORED) ----------
         const questions = [
             // ================= IT ARCHITECT =================
-            { Category: 'IT Architect', Question: 'Which architecture pattern separates an application into presentation, logic, and data layers?', A: 'Monolithic', B: '3-Tier', C: 'Event-Driven', D: 'Microservices', CorrectAnswer: 'B' },
-            { Category: 'IT Architect', Question: 'What is a key advantage of microservices architecture?', A: 'Single deployment unit', B: 'Independent scalability', C: 'Tight coupling', D: 'Single point of failure', CorrectAnswer: 'B' },
-            { Category: 'IT Architect', Question: 'Which protocol is typically used for service communication in REST APIs?', A: 'FTP', B: 'HTTP/HTTPS', C: 'SNMP', D: 'SSH', CorrectAnswer: 'B' },
-            { Category: 'IT Architect', Question: 'Which concept ensures that system components can continue functioning even if one part fails?', A: 'Fault Tolerance', B: 'Load Balancing', C: 'Data Encryption', D: 'Caching', CorrectAnswer: 'A' },
-            { Category: 'IT Architect', Question: 'Which cloud model provides virtual machines and storage but requires user-managed OS?', A: 'SaaS', B: 'PaaS', C: 'IaaS', D: 'DBaaS', CorrectAnswer: 'C' },
-            { Category: 'IT Architect', Question: 'The architectural principle of dividing services into small independent components is called ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'microservices' },
+            { Category: 'IT Architect', Question: 'Which architecture pattern improves scalability by decoupling producers and consumers using an asynchronous backbone?', A: 'SOA', B: 'CQRS', C: 'Event-Driven Architecture', D: 'Pipe-and-Filter', CorrectAnswer: 'C' },
+            { Category: 'IT Architect', Question: 'Which architectural principle states that each service should own its private data store?', A: 'Data Replication', B: 'Loose Coupling', C: 'Single Responsibility', D: 'Database per Service', CorrectAnswer: 'D' },
+            { Category: 'IT Architect', Question: 'What is the main purpose of an API Gateway in microservices?', A: 'Data storage', B: 'Centralized authentication, routing, and request aggregation', C: 'Service orchestration', D: 'DNS resolution', CorrectAnswer: 'B' },
+            { Category: 'IT Architect', Question: 'Which consistency model is typically used in large distributed systems to maximize availability?', A: 'Strong Consistency', B: 'Causal Consistency', C: 'Eventual Consistency', D: 'Immediate Consistency', CorrectAnswer: 'C' },
+            { Category: 'IT Architect', Question: 'Name the architectural pattern where write and read operations are separated into different models.', A: '', B: '', C: '', D: '', CorrectAnswer: 'CQRS' },
 
             // ================= LINUX =================
-            { Category: 'Linux', Question: 'Which command displays real-time system processes?', A: 'ps', B: 'top', C: 'df', D: 'free', CorrectAnswer: 'B' },
-            { Category: 'Linux', Question: 'Which file defines mounted file systems at boot?', A: '/etc/fstab', B: '/etc/mount', C: '/etc/rc.local', D: '/etc/startup.conf', CorrectAnswer: 'A' },
-            { Category: 'Linux', Question: 'Which command changes file permissions?', A: 'chperm', B: 'chmod', C: 'chgrp', D: 'chown', CorrectAnswer: 'B' },
-            { Category: 'Linux', Question: 'Which command is used to display disk space usage?', A: 'df -h', B: 'du -a', C: 'lsblk', D: 'fdisk -l', CorrectAnswer: 'A' },
-            { Category: 'Linux', Question: 'The default superuser account in Linux is called ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'root' },
-            { Category: 'Linux', Question: 'The configuration file for network interfaces in Ubuntu is located in ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '/etc/netplan/' },
+            { Category: 'Linux', Question: 'Which kernel feature enables running containers by providing isolated namespaces and control groups?', A: 'SELinux', B: 'systemd', C: 'Kernel Isolation', D: 'cgroups + namespaces', CorrectAnswer: 'D' },
+            { Category: 'Linux', Question: 'Which log file stores information about authentication events such as SSH login attempts?', A: '/var/log/messages', B: '/var/log/auth.log', C: '/var/log/secure', D: '/var/log/boot.log', CorrectAnswer: 'B' },
+            { Category: 'Linux', Question: 'Which command shows detailed SELinux file context information?', A: 'ls -Z', B: 'getenforce', C: 'getsebool', D: 'selinfo', CorrectAnswer: 'A' },
+            { Category: 'Linux', Question: 'Which systemd tool is used to analyze boot performance and identify slow services?', A: 'systemctl audit', B: 'bootchartd', C: 'systemd-analyze', D: 'journald-inspect', CorrectAnswer: 'C' },
+            { Category: 'Linux', Question: 'Name the Linux scheduling class designed for real-time workloads.', A: '', B: '', C: '', D: '', CorrectAnswer: 'SCHED_FIFO' },
 
             // ================= VMWARE =================
-            { Category: 'VMware', Question: 'Which VMware component manages multiple ESXi hosts?', A: 'vCenter Server', B: 'vSphere Client', C: 'vMotion', D: 'vSAN', CorrectAnswer: 'A' },
-            { Category: 'VMware', Question: 'What feature allows a VM to move between hosts without downtime?', A: 'vSAN', B: 'vMotion', C: 'HA', D: 'DRS', CorrectAnswer: 'B' },
-            { Category: 'VMware', Question: 'Which VMware feature ensures automatic restart of VMs after host failure?', A: 'vMotion', B: 'FT', C: 'HA', D: 'DRS', CorrectAnswer: 'C' },
-            { Category: 'VMware', Question: 'Which protocol is used by VMware ESXi for management communication?', A: 'SSH', B: 'HTTPS', C: 'Telnet', D: 'RDP', CorrectAnswer: 'B' },
-            { Category: 'VMware', Question: 'The default username for the vCenter Server Appliance is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'administrator@vsphere.local' },
-            { Category: 'VMware', Question: 'The file extension for a VMware virtual disk is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '.vmdk' },
+            { Category: 'VMware', Question: 'Which VMware feature provides continuous availability for a VM by maintaining a secondary VM that mirrors the primary in real time?', A: 'HA', B: 'vMotion', C: 'Fault Tolerance (FT)', D: 'DRS', CorrectAnswer: 'C' },
+            { Category: 'VMware', Question: 'Which storage technology allows ESXi hosts to share a distributed datastore without external SAN?', A: 'iSCSI', B: 'vSAN', C: 'NFS', D: 'VMFS-L', CorrectAnswer: 'B' },
+            { Category: 'VMware', Question: 'What is the purpose of VMware DRS in a cluster?', A: 'Automatically balance workloads across hosts', B: 'Encrypt VM disks', C: 'Provide backup', D: 'Automatic VM creation', CorrectAnswer: 'A' },
+            { Category: 'VMware', Question: 'Which network type in VMware supports virtual switches with distributed configuration across the cluster?', A: 'Standard Switch', B: 'vSwitch0', C: 'VLAN Switch', D: 'vSphere Distributed Switch', CorrectAnswer: 'D' },
+            { Category: 'VMware', Question: 'Name the VMware component used to manage lifecycle operations such as upgrades, patches, and firmware management.', A: '', B: '', C: '', D: '', CorrectAnswer: 'Lifecycle Manager (vLCM)' },
 
             // ================= NETWORK =================
-            { Category: 'Network', Question: 'Which protocol is used to translate domain names to IP addresses?', A: 'DHCP', B: 'DNS', C: 'NAT', D: 'ARP', CorrectAnswer: 'B' },
-            { Category: 'Network', Question: 'Which layer of the OSI model handles routing?', A: 'Data Link', B: 'Transport', C: 'Network', D: 'Session', CorrectAnswer: 'C' },
-            { Category: 'Network', Question: 'Which command is used to test network connectivity?', A: 'ping', B: 'netstat', C: 'ipconfig', D: 'nslookup', CorrectAnswer: 'A' },
-            { Category: 'Network', Question: 'Which device operates at Layer 2 of the OSI model?', A: 'Router', B: 'Switch', C: 'Hub', D: 'Firewall', CorrectAnswer: 'B' },
-            { Category: 'Network', Question: 'The default subnet mask for a Class C network is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: '255.255.255.0' },
-            { Category: 'Network', Question: 'The protocol used for secure remote management over TCP port 22 is ________.', A: '', B: '', C: '', D: '', CorrectAnswer: 'SSH' },
+            { Category: 'Network', Question: 'Which routing protocol uses Dijkstra’s SPF algorithm and supports areas for scalability?', A: 'RIP', B: 'BGP', C: 'EIGRP', D: 'OSPF', CorrectAnswer: 'D' },
+            { Category: 'Network', Question: 'Which protocol ensures high availability by providing automatic failover between routers?', A: 'HSRP', B: 'NTP', C: 'IGMP', D: 'LLDP', CorrectAnswer: 'A' },
+            { Category: 'Network', Question: 'Which IPv6 feature allows stateless autoconfiguration without DHCPv6?', A: 'SLAAC', B: 'RAID', C: 'NDP', D: 'EUI-64', CorrectAnswer: 'A' },
+            { Category: 'Network', Question: 'Which technology allows multiple VLANs to be carried on a single physical link?', A: 'Link Aggregation', B: '802.1Q Trunking', C: 'STP', D: 'MPLS', CorrectAnswer: 'B' },
+            { Category: 'Network', Question: 'Name the BGP attribute that determines the preferred exit point from an AS.', A: '', B: '', C: '', D: '', CorrectAnswer: 'LOCAL_PREF' },
         ];
 
         // ---------- Global State ----------
@@ -467,3 +463,4 @@ h1{color:#4f46e5;border-bottom:2px solid #ddd;padding-bottom:10px;}
     </script>
 </body>
 </html>
+
