@@ -100,9 +100,14 @@
 
         <div id="results-screen" class="hidden bg-card shadow-2xl rounded-2xl p-10 border border-slate-700/50 text-center">
             
-            <div class="mb-10">
+            <div class="mb-8">
                 <h2 id="thank-you-message" class="text-3xl font-bold text-primary mb-4 leading-tight"></h2>
                 <p class="text-text-secondary">Your responses have been securely recorded.</p>
+                
+                <div class="mt-6 p-4 bg-slate-800 rounded-lg inline-block">
+                    <p class="text-xs text-text-secondary uppercase tracking-widest mb-1">Exam Reference ID</p>
+                    <p id="ref-id-display" class="text-lg font-mono text-primary font-bold tracking-wider">Generating...</p>
+                </div>
             </div>
 
             <div class="flex justify-center">
@@ -134,7 +139,7 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        // ---------- ALL 24 QUESTIONS (FULLY RESTORED) ----------
+        // ---------- ALL 24 QUESTIONS ----------
         const questions = [
             // ================= IT ARCHITECT =================
             { Category: 'IT Architect', Question: 'Which architecture pattern improves scalability by decoupling producers and consumers using an asynchronous backbone?', A: 'SOA', B: 'CQRS', C: 'Event-Driven Architecture', D: 'Pipe-and-Filter', CorrectAnswer: 'C' },
@@ -169,6 +174,7 @@
         const nextButton    = document.getElementById('next-btn');
         const prevButton    = document.getElementById('prev-btn');
         const answerInput   = document.getElementById('answer-input');
+        const refIdDisplay  = document.getElementById('ref-id-display');
 
         // ---------- Helper ----------
         function calculateFinalScore() {
@@ -339,11 +345,14 @@
                 }))
             };
             try {
-                await addDoc(collection(db, "examResults"), data);
-                console.log("Results saved to Firestore");
+                // Wait for the document to be added
+                const docRef = await addDoc(collection(db, "examResults"), data);
+                console.log("Results saved to Firestore with ID:", docRef.id);
+                // RETURN THE ID
+                return docRef.id;
             } catch (e) {
                 console.error("Firestore error:", e);
-                // Silent fail for user, but logged in console
+                return null;
             }
         }
 
@@ -355,11 +364,23 @@
             quizScreen.classList.add('hidden');
             resultsScreen.classList.remove('hidden');
 
-            // Set the Thank You Message
             document.getElementById('thank-you-message').textContent = `Thank you ${employeeName} for completing the exam.`;
+            
+            // Set Loading state for ID
+            refIdDisplay.textContent = "Saving...";
+            refIdDisplay.classList.add('animate-pulse');
 
-            // Send to database silently in the background
-            sendResultsToDatabase();
+            // Send to database and update UI with the returned ID
+            sendResultsToDatabase().then(docId => {
+                refIdDisplay.classList.remove('animate-pulse');
+                if (docId) {
+                    refIdDisplay.textContent = docId;
+                    refIdDisplay.classList.add('text-primary');
+                } else {
+                    refIdDisplay.textContent = "Error saving results";
+                    refIdDisplay.classList.add('text-error-text');
+                }
+            });
         }
 
         function resetApp() {
@@ -369,6 +390,9 @@
             startScreen.classList.remove('hidden');
             startStatus.textContent = '';
             document.getElementById('employee-name-input').value = '';
+            // Reset Ref ID style
+            refIdDisplay.textContent = 'Generating...';
+            refIdDisplay.classList.remove('text-error-text', 'text-primary');
         }
     </script>
 </body>
