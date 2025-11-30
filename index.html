@@ -55,7 +55,6 @@
             Powered by the brilliant mind - Stas Shnaider, ITOps genius.
         </div>
 
-        <!-- START SCREEN -->
         <div id="start-screen" class="bg-card shadow-2xl rounded-2xl p-10 border border-slate-700/50">
             <h2 class="text-2xl font-semibold mb-4 text-primary">Full Name</h2>
             <p class="text-text-secondary mb-6">Enter the employee's name to begin the technical assessment.</p>
@@ -70,7 +69,6 @@
             </button>
         </div>
 
-        <!-- QUIZ SCREEN -->
         <div id="quiz-screen" class="hidden bg-card shadow-2xl rounded-2xl p-10 border border-slate-700/50">
             <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
                 <h2 class="text-xl font-semibold text-primary" id="question-number">Question 1/X</h2>
@@ -100,30 +98,22 @@
             </div>
         </div>
 
-        <!-- RESULTS SCREEN -->
-        <div id="results-screen" class="hidden bg-card shadow-2xl rounded-2xl p-10 border border-slate-700/50">
-            <h2 class="text-3xl font-bold text-primary mb-3 text-center" id="results-title">Exam Completed</h2>
-            <p class="text-lg text-text-secondary mb-8 text-center">Final Overall Score</p>
-
-            <div class="p-6 bg-slate-800/50 rounded-xl mb-8 text-center">
-                <p class="text-xl font-medium text-text-secondary">Overall Score:</p>
-                <div class="text-7xl font-extrabold text-white mt-1" id="final-score-display">--/--</div>
+        <div id="results-screen" class="hidden bg-card shadow-2xl rounded-2xl p-10 border border-slate-700/50 text-center">
+            
+            <div class="mb-10">
+                <h2 id="thank-you-message" class="text-3xl font-bold text-primary mb-4 leading-tight"></h2>
+                <p class="text-text-secondary">Your responses have been securely recorded.</p>
             </div>
 
-            <div class="mb-10 pt-4 flex space-x-4 justify-center">
-                <button onclick="exam.printRecap()" class="btn-primary text-text-light font-semibold py-3 px-6 rounded-lg transition">
-                    Print Summary (Detailed Recap)
-                </button>
-                <button onclick="exam.resetApp()" class="bg-slate-600 hover:bg-slate-500 text-text-light font-semibold py-3 px-6 rounded-lg shadow-lg transition">
-                    Restart
+            <div class="flex justify-center">
+                <button onclick="exam.resetApp()" class="btn-primary text-text-light font-semibold py-3 px-8 rounded-lg shadow-lg transition">
+                    Start New Exam
                 </button>
             </div>
 
-            <div id="recap-container" class="hidden"></div>
         </div>
     </div>
 
-    <!-- ====================== MODULE SCRIPT WITH ALL QUESTIONS ====================== -->
     <script type="module">
         // ---------- Firebase ----------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -192,7 +182,6 @@
             goToPrevQuestion,
             checkAnswerAndAdvance,
             showResults,
-            printRecap,
             resetApp
         };
         window.exam = exam;
@@ -316,8 +305,8 @@
         function checkAnswerAndAdvance() {
             const attempt = userAnswers[currentQuestionIndex];
             if (!attempt || attempt.selected === null || attempt.selected.toString().trim() === '') {
-                document.getElementById('answer-error').textContent = attempt.isMCQ ?
-                    'Please select an answer before moving to the next question.' :
+                document.getElementById('answer-error').textContent = attempt.isMCQ ? 
+                    'Please select an answer before moving to the next question.' : 
                     'Please enter an answer before moving to the next question.';
                 return;
             }
@@ -354,7 +343,7 @@
                 console.log("Results saved to Firestore");
             } catch (e) {
                 console.error("Firestore error:", e);
-                alert("Could not save results – check console.");
+                // Silent fail for user, but logged in console
             }
         }
 
@@ -365,77 +354,12 @@
 
             quizScreen.classList.add('hidden');
             resultsScreen.classList.remove('hidden');
-            document.getElementById('final-score-display').textContent = `${finalScore}/${total}`;
 
-            const box = document.querySelector('#final-score-display').parentNode;
-            let nameEl = document.getElementById('employee-name-display');
-            if (nameEl) nameEl.remove();
-            nameEl = document.createElement('p');
-            nameEl.id = 'employee-name-display';
-            nameEl.className = 'text-2xl font-bold text-text-light mb-2';
-            nameEl.textContent = employeeName;
-            box.insertBefore(nameEl, box.firstElementChild);
+            // Set the Thank You Message
+            document.getElementById('thank-you-message').textContent = `Thank you ${employeeName} for completing the exam.`;
 
+            // Send to database silently in the background
             sendResultsToDatabase();
-        }
-
-        function printRecap() {
-            const total = questions.length;
-            const finalScore = calculateFinalScore();
-            const perc = total ? ((finalScore/total)*100).toFixed(1) : 0;
-            const date = new Date().toISOString().slice(0,10);
-            const file = `${employeeName.replace(/[^a-zA-Z0-9\s]/g,'').trim().replace(/\s+/g,'_')}_Assessment_Summary_${date}`;
-
-            let html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${file}</title>
-<style>
-body{font-family:sans-serif;margin:30px;color:#212121;}
-h1{color:#4f46e5;border-bottom:2px solid #ddd;padding-bottom:10px;}
-.score-box{border:1px solid #ccc;padding:15px;margin-bottom:20px;text-align:center;}
-.score-number{font-size:3em;font-weight:bold;}
-.question-item{border:1px solid #ddd;padding:15px;margin-top:15px;border-radius:8px;page-break-inside:avoid;}
-.question-text{font-weight:bold;margin-bottom:10px;}
-.option-div{padding:5px;border-radius:4px;margin-bottom:4px;}
-.option-correct-choice{background:#d4edda;border:1px solid #c3e6cb;}
-.option-incorrect-choice{background:#f8d7da;border:1px solid #f5c6cb;}
-.option-correct-answer{background:#e2f0d4;border:1px solid #c9e0b1;}
-.prefix-correct{color:#155724;font-weight:bold;}
-.prefix-incorrect{color:#721c24;font-weight:bold;}
-</style></head><body>
-<h1>Tier 3 Assessment Summary for ${employeeName}</h1>
-<div class="score-box"><h2>Overall Score:</h2><div class="score-number">${finalScore}/${total}</div>
-<p>Percentage: ${perc}%</p><p>Date: ${new Date().toLocaleDateString('en-US')}</p></div>
-<h2>Detailed Exam Recap</h2>`;
-
-            userAnswers.forEach((a, i) => {
-                let block = `<div class="question-item"><p class="question-text">${i+1}. ${a.question}</p>`;
-                if (a.isMCQ) {
-                    Object.keys(a.options).forEach(k => {
-                        if (!a.options[k]) return;
-                        let cls = '', pref = '';
-                        if (k===a.selected && a.isCorrect) { cls='option-correct-choice'; pref='<span class="prefix-correct">CORRECT CHOICE:</span> '; }
-                        else if (k===a.selected && !a.isCorrect) { cls='option-incorrect-choice'; pref='<span class="prefix-incorrect">YOUR CHOICE:</span> '; }
-                        else if (k===a.correct) { cls='option-correct-answer'; pref='<span class="prefix-correct">CORRECT ANSWER:</span> '; }
-                        block += `<div class="option-div ${cls}">${k}. ${pref}${a.options[k]}</div>`;
-                    });
-                } else {
-                    const sel = a.selected || "No Answer Given";
-                    if (a.isCorrect) {
-                        block += `<div class="option-div option-correct-choice"><span class="prefix-correct">YOUR ANSWER (Correct):</span> ${sel}</div>`;
-                    } else {
-                        block += `<div class="option-div option-incorrect-choice"><span class="prefix-incorrect">YOUR ANSWER (Incorrect):</span> ${sel}</div>
-                                  <div class="option-div option-correct-answer"><span class="prefix-correct">CORRECT ANSWER(S):</span> ${a.correct.split('|').join(', ')}</div>`;
-                    }
-                }
-                block += `</div>`;
-                html += block;
-            });
-
-            html += `</body></html>`;
-            const win = window.open('', '', 'height=600,width=800');
-            win.document.title = file;
-            win.document.write(html);
-            win.document.close();
-            win.print();
         }
 
         function resetApp() {
@@ -445,11 +369,7 @@ h1{color:#4f46e5;border-bottom:2px solid #ddd;padding-bottom:10px;}
             startScreen.classList.remove('hidden');
             startStatus.textContent = '';
             document.getElementById('employee-name-input').value = '';
-            const nameEl = document.getElementById('employee-name-display');
-            if (nameEl) nameEl.remove();
         }
     </script>
 </body>
 </html>
-
-
