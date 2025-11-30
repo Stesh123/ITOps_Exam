@@ -148,30 +148,18 @@
         const questions = [
             // ================= IT ARCHITECT =================
             { Category: 'IT Architect', Question: 'Which architecture pattern improves scalability by decoupling producers and consumers using an asynchronous backbone?', A: 'SOA', B: 'CQRS', C: 'Event-Driven Architecture', D: 'Pipe-and-Filter', CorrectAnswer: 'C' },
-            { Category: 'IT Architect', Question: 'Which architectural principle states that each service should own its private data store?', A: 'Data Replication', B: 'Loose Coupling', C: 'Single Responsibility', D: 'Database per Service', CorrectAnswer: 'D' },
-            { Category: 'IT Architect', Question: 'What is the main purpose of an API Gateway in microservices?', A: 'Data storage', B: 'Centralized authentication, routing, and request aggregation', C: 'Service orchestration', D: 'DNS resolution', CorrectAnswer: 'B' },
-            { Category: 'IT Architect', Question: 'Which consistency model is typically used in large distributed systems to maximize availability?', A: 'Strong Consistency', B: 'Causal Consistency', C: 'Eventual Consistency', D: 'Immediate Consistency', CorrectAnswer: 'C' },
             { Category: 'IT Architect', Question: 'Name the architectural pattern where write and read operations are separated into different models.', A: '', B: '', C: '', D: '', CorrectAnswer: 'CQRS' },
 
             // ================= LINUX =================
             { Category: 'Linux', Question: 'Which kernel feature enables running containers by providing isolated namespaces and control groups?', A: 'SELinux', B: 'systemd', C: 'Kernel Isolation', D: 'cgroups + namespaces', CorrectAnswer: 'D' },
-            { Category: 'Linux', Question: 'Which log file stores information about authentication events such as SSH login attempts?', A: '/var/log/messages', B: '/var/log/auth.log', C: '/var/log/secure', D: '/var/log/boot.log', CorrectAnswer: 'B' },
-            { Category: 'Linux', Question: 'Which command shows detailed SELinux file context information?', A: 'ls -Z', B: 'getenforce', C: 'getsebool', D: 'selinfo', CorrectAnswer: 'A' },
-            { Category: 'Linux', Question: 'Which systemd tool is used to analyze boot performance and identify slow services?', A: 'systemctl audit', B: 'bootchartd', C: 'systemd-analyze', D: 'journald-inspect', CorrectAnswer: 'C' },
             { Category: 'Linux', Question: 'Name the Linux scheduling class designed for real-time workloads.', A: '', B: '', C: '', D: '', CorrectAnswer: 'SCHED_FIFO' },
 
             // ================= VMWARE =================
             { Category: 'VMware', Question: 'Which VMware feature provides continuous availability for a VM by maintaining a secondary VM that mirrors the primary in real time?', A: 'HA', B: 'vMotion', C: 'Fault Tolerance (FT)', D: 'DRS', CorrectAnswer: 'C' },
-            { Category: 'VMware', Question: 'Which storage technology allows ESXi hosts to share a distributed datastore without external SAN?', A: 'iSCSI', B: 'vSAN', C: 'NFS', D: 'VMFS-L', CorrectAnswer: 'B' },
-            { Category: 'VMware', Question: 'What is the purpose of VMware DRS in a cluster?', A: 'Automatically balance workloads across hosts', B: 'Encrypt VM disks', C: 'Provide backup', D: 'Automatic VM creation', CorrectAnswer: 'A' },
-            { Category: 'VMware', Question: 'Which network type in VMware supports virtual switches with distributed configuration across the cluster?', A: 'Standard Switch', B: 'vSwitch0', C: 'VLAN Switch', D: 'vSphere Distributed Switch', CorrectAnswer: 'D' },
             { Category: 'VMware', Question: 'Name the VMware component used to manage lifecycle operations such as upgrades, patches, and firmware management.', A: '', B: '', C: '', D: '', CorrectAnswer: 'Lifecycle Manager (vLCM)' },
 
             // ================= NETWORK =================
             { Category: 'Network', Question: 'Which routing protocol uses Dijkstra’s SPF algorithm and supports areas for scalability?', A: 'RIP', B: 'BGP', C: 'EIGRP', D: 'OSPF', CorrectAnswer: 'D' },
-            { Category: 'Network', Question: 'Which protocol ensures high availability by providing automatic failover between routers?', A: 'HSRP', B: 'NTP', C: 'IGMP', D: 'LLDP', CorrectAnswer: 'A' },
-            { Category: 'Network', Question: 'Which IPv6 feature allows stateless autoconfiguration without DHCPv6?', A: 'SLAAC', B: 'RAID', C: 'NDP', D: 'EUI-64', CorrectAnswer: 'A' },
-            { Category: 'Network', Question: 'Which technology allows multiple VLANs to be carried on a single physical link?', A: 'Link Aggregation', B: '802.1Q Trunking', C: 'STP', D: 'MPLS', CorrectAnswer: 'B' },
             { Category: 'Network', Question: 'Name the BGP attribute that determines the preferred exit point from an AS.', A: '', B: '', C: '', D: '', CorrectAnswer: 'LOCAL_PREF' },
         ];
 
@@ -463,4 +451,5 @@ h1{color:#4f46e5;border-bottom:2px solid #ddd;padding-bottom:10px;}
     </script>
 </body>
 </html>
+
 
