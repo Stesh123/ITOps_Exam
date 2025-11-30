@@ -142,20 +142,25 @@
         // ---------- ALL 24 QUESTIONS ----------
         const questions = [
             // ================= IT ARCHITECT =================
-            { Category: 'IT Architect', Question: 'Which architecture pattern improves scalability by decoupling producers and consumers using an asynchronous backbone?', A: 'SOA', B: 'CQRS', C: 'Event-Driven Architecture', D: 'Pipe-and-Filter', CorrectAnswer: 'C' },
-            { Category: 'IT Architect', Question: 'Name the architectural pattern where write and read operations are separated into different models.', A: '', B: '', C: '', D: '', CorrectAnswer: 'CQRS' },
+            { Category: 'IT Architect', Question: 'In a globally distributed microservices system, which pattern minimizes cross-region latency spikes by ensuring read-after-write consistency through multi-leader replication conflict resolution?', A: 'CRDT-based Replication', B: 'Lamport Clocks', C: 'Eventual Consistency', D: 'Gossip Protocol', CorrectAnswer: 'CRDT-based Replication' },
 
-            // ================= LINUX =================
-            { Category: 'Linux', Question: 'Which kernel feature enables running containers by providing isolated namespaces and control groups?', A: 'SELinux', B: 'systemd', C: 'Kernel Isolation', D: 'cgroups + namespaces', CorrectAnswer: 'D' },
-            { Category: 'Linux', Question: 'Name the Linux scheduling class designed for real-time workloads.', A: '', B: '', C: '', D: '', CorrectAnswer: 'SCHED_FIFO' },
+            { Category: 'IT Architect', Question: 'Which VMware vSphere mechanism determines optimal VM NUMA placement by dynamically generating a weighted cost model based on topology hints and workload entropy?', A: 'DRS Predictive Mode', B: 'vNUMA Auto-Detection', C: 'DRS NUMA Optimization', D: 'ESXi CPU Scheduler Fairness Model', CorrectAnswer: 'DRS NUMA Optimization' },
 
-            // ================= VMWARE =================
-            { Category: 'VMware', Question: 'Which VMware feature provides continuous availability for a VM by maintaining a secondary VM that mirrors the primary in real time?', A: 'HA', B: 'vMotion', C: 'Fault Tolerance (FT)', D: 'DRS', CorrectAnswer: 'C' },
-            { Category: 'VMware', Question: 'Name the VMware component used to manage lifecycle operations such as upgrades, patches, and firmware management.', A: '', B: '', C: '', D: '', CorrectAnswer: 'Lifecycle Manager (vLCM)' },
+            { Category: 'IT Architect', Question: 'Which distributed systems architecture pattern is designed to prevent cascading failures by isolating call chains and introducing probabilistic backoff algorithms?', A: 'Bulkhead Pattern', B: 'Circuit Breaker', C: 'Time-Out Wrapper', D: 'Saga Orchestration', CorrectAnswer: 'Bulkhead Pattern' },
 
-            // ================= NETWORK =================
-            { Category: 'Network', Question: 'Which routing protocol uses Dijkstra’s SPF algorithm and supports areas for scalability?', A: 'RIP', B: 'BGP', C: 'EIGRP', D: 'OSPF', CorrectAnswer: 'D' },
-            { Category: 'Network', Question: 'Name the BGP attribute that determines the preferred exit point from an AS.', A: '', B: '', C: '', D: '', CorrectAnswer: 'LOCAL_PREF' },
+            { Category: 'IT Architect', Question: 'In NSX-T multi-site designs, which routing mechanism prevents asymmetric flows during active-active Tier-0 deployments when using ECMP with stateful services?', A: 'BGP AS-Path Prepending', B: 'Route Aggregation', C: 'Service Router Pinning', D: 'Policy-Based Routing', CorrectAnswer: 'Service Router Pinning' },
+
+            { Category: 'IT Architect', Question: 'Which VMware vSAN ESA internal process eliminates write amplification by transforming incoming writes into log-structured objects within a single-tier storage subsystem?', A: 'Adaptive RAID Engine', B: 'vSAN Log-Structured FS', C: 'Optimized Data Path (ODP)', D: 'ESA Write Pipeline', CorrectAnswer: 'ESA Write Pipeline' },
+
+            { Category: 'IT Architect', Question: 'Which enterprise integration pattern enables ultra-high-throughput event routing by using topic-space partitioning combined with distributed commit logs?', A: 'Message Routing', B: 'Publisher-Subscriber', C: 'Log-Based Event Streaming', D: 'Content-Based Router', CorrectAnswer: 'Log-Based Event Streaming' },
+
+            { Category: 'IT Architect', Question: 'Which ESXi CPU scheduling mechanism ensures fairness when vCPUs of a VM require simultaneous execution on multiple pCPUs, preventing disproportionate Ready Time?', A: 'Relaxed Co-Stop Model', B: 'SMP Concurrency Scheduler', C: 'Strict Wide-VM Scheduling', D: 'Gang Scheduling', CorrectAnswer: 'Relaxed Co-Stop Model' },
+
+            { Category: 'IT Architect', Question: 'In multi-region distributed database architectures, what fundamental principle ensures correctness when reconciling divergent replicas after partition healing?', A: '', B: '', C: '', D: '', CorrectAnswer: 'Strong Eventual Consistency (SEC)' },
+
+            { Category: 'IT Architect', Question: 'In VMware cloud-native stacks, what core architectural component acts as the authoritative control plane for mapping supervisor cluster resources to workload clusters?', A: '', B: '', C: '', D: '', CorrectAnswer: 'Cluster Control Plane API (Tanzu Supervisor)' },
+
+            { Category: 'IT Architect', Question: 'What advanced architectural strategy is used to reduce blast radius and transactional coupling in ultra-large monolith-to-distributed transitions when domain boundaries are not fully defined?', A: '', B: '', C: '', D: '', CorrectAnswer: 'Strangler Fig Pattern with Incremental Context Decomposition' }
         ];
 
         // ---------- Global State ----------
@@ -397,3 +402,4 @@
     </script>
 </body>
 </html>
+
