@@ -57,10 +57,14 @@
 
         <div id="start-screen" class="bg-card shadow-2xl rounded-2xl p-10 border border-slate-700/50">
             <h2 class="text-2xl font-semibold mb-4 text-primary">Full Name</h2>
-            <p class="text-text-secondary mb-6">Enter the employee's name to begin the technical assessment.</p>
+            <p class="text-text-secondary mb-6">Enter the employee's name and upload the question file to begin the assessment.</p>
 
             <input type="text" id="employee-name-input" placeholder="Enter Employee Full Name (Required)" 
-                   class="w-full p-3 mb-6 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none">
+                    class="w-full p-3 mb-4 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none">
+            
+            <label for="csv-upload" class="block text-text-light mb-2 font-medium">Upload Questions CSV (Required)</label>
+            <input type="file" id="csv-upload" accept=".csv"
+                    class="w-full p-3 mb-6 block rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30">
 
             <p id="start-status" class="mt-4 text-center text-sm text-error-text h-5"></p>
 
@@ -83,7 +87,7 @@
 
             <div id="fill-in-container" class="space-y-4 hidden">
                 <input type="text" id="answer-input" placeholder="Type your answer here..."
-                       class="w-full p-4 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none text-xl">
+                        class="w-full p-4 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none text-xl">
             </div>
 
             <p id="answer-error" class="text-error-text text-sm h-5 text-center"></p>
@@ -119,6 +123,8 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
     <script type="module">
         // ---------- Firebase ----------
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
@@ -139,24 +145,8 @@
         const analytics = getAnalytics(app);
         const db = getFirestore(app);
 
-        // ---------- ALL 24 QUESTIONS ----------
-        const questions = [
-            // ================= IT ARCHITECT =================
-            { Category: 'IT Architect', Question: 'Which architecture pattern improves scalability by decoupling producers and consumers using an asynchronous backbone?', A: 'SOA', B: 'CQRS', C: 'Event-Driven Architecture', D: 'Pipe-and-Filter', CorrectAnswer: 'C' },
-            { Category: 'IT Architect', Question: 'Name the architectural pattern where write and read operations are separated into different models.', A: '', B: '', C: '', D: '', CorrectAnswer: 'CQRS' },
-
-            // ================= LINUX =================
-            { Category: 'Linux', Question: 'Which kernel feature enables running containers by providing isolated namespaces and control groups?', A: 'SELinux', B: 'systemd', C: 'Kernel Isolation', D: 'cgroups + namespaces', CorrectAnswer: 'D' },
-            { Category: 'Linux', Question: 'Name the Linux scheduling class designed for real-time workloads.', A: '', B: '', C: '', D: '', CorrectAnswer: 'SCHED_FIFO' },
-
-            // ================= VMWARE =================
-            { Category: 'VMware', Question: 'Which VMware feature provides continuous availability for a VM by maintaining a secondary VM that mirrors the primary in real time?', A: 'HA', B: 'vMotion', C: 'Fault Tolerance (FT)', D: 'DRS', CorrectAnswer: 'C' },
-            { Category: 'VMware', Question: 'Name the VMware component used to manage lifecycle operations such as upgrades, patches, and firmware management.', A: '', B: '', C: '', D: '', CorrectAnswer: 'Lifecycle Manager (vLCM)' },
-
-            // ================= NETWORK =================
-            { Category: 'Network', Question: 'Which routing protocol uses Dijkstra’s SPF algorithm and supports areas for scalability?', A: 'RIP', B: 'BGP', C: 'EIGRP', D: 'OSPF', CorrectAnswer: 'D' },
-            { Category: 'Network', Question: 'Name the BGP attribute that determines the preferred exit point from an AS.', A: '', B: '', C: '', D: '', CorrectAnswer: 'LOCAL_PREF' },
-        ];
+        // ---------- QUESTIONS - Now loaded from CSV ----------
+        let questions = []; 
 
         // ---------- Global State ----------
         let currentQuestionIndex = 0;
@@ -164,17 +154,19 @@
         let employeeName = '';
         let score = 0;
 
-        const KEYS = { QUESTION:'Question', CATEGORY:'Category', A:'A', B:'B', C:'C', D:'D', CORRECT:'CorrectAnswer' };
+        // Keys must match the CSV column headers exactly
+        const KEYS = { CATEGORY:'Category', QUESTION:'Question', A:'A', B:'B', C:'C', D:'D', CORRECT:'CorrectAnswer' };
 
         // ---------- DOM ----------
-        const startScreen   = document.getElementById('start-screen');
-        const quizScreen    = document.getElementById('quiz-screen');
-        const resultsScreen = document.getElementById('results-screen');
-        const startStatus   = document.getElementById('start-status');
-        const nextButton    = document.getElementById('next-btn');
-        const prevButton    = document.getElementById('prev-btn');
-        const answerInput   = document.getElementById('answer-input');
-        const refIdDisplay  = document.getElementById('ref-id-display');
+        const startScreen     = document.getElementById('start-screen');
+        const quizScreen      = document.getElementById('quiz-screen');
+        const resultsScreen   = document.getElementById('results-screen');
+        const startStatus     = document.getElementById('start-status');
+        const nextButton      = document.getElementById('next-btn');
+        const prevButton      = document.getElementById('prev-btn');
+        const answerInput     = document.getElementById('answer-input');
+        const refIdDisplay    = document.getElementById('ref-id-display');
+        const csvFileInput    = document.getElementById('csv-upload');
 
         // ---------- Helper ----------
         function calculateFinalScore() {
@@ -192,22 +184,64 @@
         };
         window.exam = exam;
 
+        // ----- CSV LOADING (NEW) -----
+        function loadQuestionsFromCSV(file) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(file, {
+                    header: true, // Treat the first row as column headers
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        // Filter out bad/empty data and ensure keys are present
+                        const cleanQuestions = results.data.filter(q => q[KEYS.QUESTION] && q[KEYS.CORRECT]);
+                        resolve(cleanQuestions);
+                    },
+                    error: (error) => {
+                        reject(error);
+                    }
+                });
+            });
+        }
+
+
         // ----- START -----
-        function checkNameAndStart() {
+        async function checkNameAndStart() {
             const name = document.getElementById('employee-name-input').value.trim();
+            const csvFile = csvFileInput.files[0];
+            
             if (!name) { startStatus.textContent = "Error: Please enter the employee's full name."; return; }
+            if (!csvFile) { startStatus.textContent = "Error: Please upload the questions CSV file."; return; }
+            
             employeeName = name;
             startStatus.textContent = '';
-            exam.startQuiz();
+            
+            try {
+                // 1. Load questions from the uploaded CSV
+                startStatus.textContent = "Loading questions...";
+                questions = await loadQuestionsFromCSV(csvFile);
+
+                if (questions.length === 0) {
+                    startStatus.textContent = "Error: No questions found in the CSV file.";
+                    return;
+                }
+                
+                startStatus.textContent = ''; // Clear status on success
+                exam.startQuiz();
+
+            } catch(e) {
+                console.error("CSV Loading Error:", e);
+                startStatus.textContent = `Error loading questions: ${e.message || "Invalid CSV format."}`;
+            }
         }
 
         function startQuiz() {
             currentQuestionIndex = 0;
+            // Initialize userAnswers based on the dynamically loaded questions
             userAnswers = questions.map(q => ({
                 question: q[KEYS.QUESTION],
                 category: q[KEYS.CATEGORY],
-                isMCQ: !!q[KEYS.A].trim(),
-                options: { A:q[KEYS.A], B:q[KEYS.B], C:q[KEYS.C], D:q[KEYS.D] },
+                // Check if options A, B, C, or D have content to determine MCQ vs Fill-in
+                isMCQ: !!(q[KEYS.A].trim() || q[KEYS.B].trim() || q[KEYS.C].trim() || q[KEYS.D].trim()), 
+                options: { A: q[KEYS.A], B: q[KEYS.B], C: q[KEYS.C], D: q[KEYS.D] },
                 selected: null,
                 correct: q[KEYS.CORRECT],
                 isCorrect: false
@@ -240,20 +274,29 @@
 
             if (attempt.isMCQ) {
                 opts.classList.remove('hidden'); fill.classList.add('hidden');
-                ['A','B','C','D'].forEach(k => {
-                    if (!q[k]) return;
+                // Iterate through the options in the attempt object (which handles any missing keys gracefully)
+                Object.keys(attempt.options).forEach(k => {
+                    const text = attempt.options[k];
+                    if (!text || text.trim() === '') return;
+                    
                     const btn = document.createElement('button');
-                    btn.textContent = `${k}. ${q[k]}`;
+                    btn.textContent = `${k}. ${text}`;
                     btn.className = `option-button w-full text-left p-4 rounded-lg bg-slate-700 hover:bg-primary/50 transition shadow-md font-medium`;
-                    if (attempt.selected === k) btn.className = `option-button w-full text-left p-4 rounded-lg bg-selection ring-2 ring-primary/50 transition shadow-md font-medium`;
+                    // Highlight selected option
+                    if (attempt.selected === k) {
+                         btn.classList.remove('bg-slate-700','hover:bg-primary/50');
+                         btn.className += ` bg-selection ring-2 ring-primary/50`;
+                    }
                     btn.onclick = () => selectMCQAnswer(k);
                     btn.id = `option-${k}`;
                     opts.appendChild(btn);
                 });
             } else {
                 opts.classList.add('hidden'); fill.classList.remove('hidden');
+                // Restore previous fill-in answer if available
                 if (attempt.selected !== null) answerInput.value = attempt.selected;
-                answerInput.oninput = submitFillInAnswer;
+                // Set the function to run every time the user types
+                answerInput.oninput = submitFillInAnswer; 
             }
 
             updateNextButtonState();
@@ -282,7 +325,10 @@
                 b.classList.add('bg-slate-700','hover:bg-primary/50');
             });
             const sel = document.getElementById(`option-${key}`);
-            if (sel) sel.classList.add('bg-selection','ring-2','ring-primary/50');
+            if (sel) {
+                sel.classList.add('bg-selection','ring-2','ring-primary/50');
+                sel.classList.remove('bg-slate-700','hover:bg-primary/50');
+            }
 
             updateNextButtonState();
         }
@@ -292,10 +338,12 @@
             const q = questions[currentQuestionIndex];
             const txt = answerInput.value.trim();
             attempt.selected = txt;
+            
             if (txt) {
-                const norm = txt.toLowerCase();
-                const correct = q[KEYS.CORRECT].split('|').map(c=>c.trim().toLowerCase());
-                attempt.isCorrect = correct.includes(norm);
+                // Allows for multiple possible correct answers separated by '|' in the CSV
+                const correctAnswers = q[KEYS.CORRECT].split('|').map(c => c.trim().toLowerCase());
+                const normalizedAnswer = txt.toLowerCase();
+                attempt.isCorrect = correctAnswers.includes(normalizedAnswer);
             } else {
                 attempt.isCorrect = false;
             }
@@ -384,12 +432,13 @@
         }
 
         function resetApp() {
-            currentQuestionIndex = 0; score = 0; userAnswers = []; employeeName = '';
+            currentQuestionIndex = 0; score = 0; userAnswers = []; employeeName = ''; questions = [];
             resultsScreen.classList.add('hidden');
             quizScreen.classList.add('hidden');
             startScreen.classList.remove('hidden');
             startStatus.textContent = '';
             document.getElementById('employee-name-input').value = '';
+            csvFileInput.value = ''; // Clear file input
             // Reset Ref ID style
             refIdDisplay.textContent = 'Generating...';
             refIdDisplay.classList.remove('text-error-text', 'text-primary');
