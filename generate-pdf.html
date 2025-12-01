@@ -171,71 +171,67 @@
 
         // Styles for RTL flow (Hebrew)
         const rtlStyle = isHebrewQuestion ? 'direction:rtl; text-align:right;' : '';
-        // Styles for answer containers to ensure word wrapping and proper display flow
-        const ansContainerStyle = `
-            padding:10px 14px;
-            border-radius:8px;
-            margin:6px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            ${isHebrewQuestion ? 'direction:rtl;' : 'direction:ltr;'}
-        `;
-        // Styles for the answer text itself to ensure word breaking/wrapping
-        const ansTextStyle = `
-            flex-grow: 1; 
-            margin-left: 10px; 
-            ${isHebrewQuestion ? 'margin-right: 10px; margin-left: 0; text-align: right;' : 'text-align: left;'} 
-            word-wrap: break-word; 
-            word-break: break-word;
-        `;
 
-
-        // Key fix for page cuts: page-break-inside: avoid;
+        // Key fix for page cuts and overflow/wrapping
         let block = `<div style="border:1px solid #e5e7eb;padding:18px;margin:18px 0;border-radius:12px;background:#fff;${rtlStyle} page-break-inside: avoid; break-inside: avoid;">
-          <p style="font-weight:700;font-size:16px;margin:0 0 12px;color:#1f2937;${rtlStyle} word-wrap: break-word; word-break: break-word;">
+          <p style="font-weight:700;font-size:16px;margin:0 0 12px;color:#1f2937;${rtlStyle} word-wrap: break-word; word-break: break-all;">
             ${i+1}. <span style="color:#4f46e5;">[${a.category}]</span> ${escape(a.question)}
           </p>`;
 
+        
+        // --- Answer Block Generation (Lays out the answer labels and text) ---
+        const generateAnswerHTML = (label, answerText, color, isCorrect) => {
+          const bg = isCorrect ? '#ecfdf5' : '#fef2f2'; // light green or light red
+          const textColor = isCorrect ? '#065f46' : '#991b1b'; // dark green or dark red
+          const borderColor = isCorrect ? '#a7f3d0' : '#fecaca';
+
+          // Corrected CSS for RTL/LTR flow using floats for robustness in html2pdf
+          let labelFloat = 'float: left;';
+          let textFloat = 'float: right;';
+          let textAlign = 'text-align: right;';
+          let labelColor = isCorrect ? '#065f46' : '#991b1b'; // Use the main text color for the label
+          
+          if (isHebrewQuestion) {
+            // For Hebrew, the label is on the right, text is on the left
+            labelFloat = 'float: right;';
+            textFloat = 'float: left;';
+            textAlign = 'text-align: left;';
+            labelColor = isCorrect ? '#065f46' : '#991b1b'; // LTR labels are English, so keep LTR color
+          }
+
+          let html = `<div style="background:${bg};padding:10px 14px;border-radius:8px;margin:6px 0;border:1px solid ${borderColor}; clear: both; overflow: hidden;">
+              <strong style="${labelFloat} color:${labelColor}; font-weight:700;">${label}:</strong>
+              <span style="${textFloat} color:${textColor}; ${textAlign} max-width: 80%; word-wrap: break-word; word-break: break-all;">${answerText}</span>
+          </div>`;
+          return html;
+        };
+
+        
         if (isMCQ) {
           // --- MULTIPLE CHOICE QUESTION LOGIC (MCQ) ---
           if (a.isCorrect) {
-            block += `<div style="${ansContainerStyle} background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;">
-                <strong style="flex-shrink: 0;">CORRECT:</strong> 
-                <span style="${ansTextStyle}">${userFullAnswer}</span>
-            </div>`;
+            block += generateAnswerHTML('CORRECT', userFullAnswer, '#065f46', true);
           } else {
-            block += `<div style="${ansContainerStyle} background:#fef2f2;color:#991b1b;border:1px solid #fecaca;">
-                <strong style="flex-shrink: 0;">YOUR ANSWER:</strong> 
-                <span style="${ansTextStyle}">${userFullAnswer}</span>
-            </div>
-            <div style="${ansContainerStyle} background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;">
-                <strong style="flex-shrink: 0;">CORRECT:</strong> 
-                <span style="${ansTextStyle}">${correctFullAnswer}</span>
-            </div>`;
+            // User's incorrect answer
+            block += generateAnswerHTML('YOUR ANSWER', userFullAnswer, '#991b1b', false);
+            // Correct answer
+            block += generateAnswerHTML('CORRECT', correctFullAnswer, '#166534', true);
           }
         } else {
           // --- FILL-IN-THE-BLANK QUESTION LOGIC ---
           const userAns = a.selected ? userFullAnswer : "<em style='color:#9ca3af'>No answer</em>";
-          // For correct fill-in answer, handle potential multiple correct answers separated by '|'
           const correctAnsText = a.correct ? escape(a.correct.split('|').join(', ')) : 'N/A';
 
           if (a.isCorrect) {
-            block += `<div style="${ansContainerStyle} background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;">
-                <strong style="flex-shrink: 0;">YOUR ANSWER (Correct):</strong>
-                <span style="${ansTextStyle}">${userAns}</span>
-            </div>`;
+            block += generateAnswerHTML('YOUR ANSWER (Correct)', userAns, '#065f46', true);
           } else {
-            block += `<div style="${ansContainerStyle} background:#fef2f2;color:#991b1b;border:1px solid #fecaca;">
-                <strong style="flex-shrink: 0;">YOUR ANSWER:</strong> 
-                <span style="${ansTextStyle}">${userAns}</span>
-            </div>
-            <div style="${ansContainerStyle} background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;">
-                <strong style="flex-shrink: 0;">CORRECT:</strong> 
-                <span style="${ansTextStyle}">${correctAnsText}</span>
-            </div>`;
+            // User's incorrect answer
+            block += generateAnswerHTML('YOUR ANSWER', userAns, '#991b1b', false);
+            // Correct answer
+            block += generateAnswerHTML('CORRECT', correctAnsText, '#166534', true);
           }
         }
+        
         block += `</div>`;
         answerBlocks += block;
       });
