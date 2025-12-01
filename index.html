@@ -30,6 +30,9 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        /* Add a Hebrew font that supports non-breaking line breaks, like Rubik */
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap');
+
         :root { font-family: 'Inter', sans-serif; }
         .btn-primary {
             background: linear-gradient(145deg, #6366f1, #4f46e5);
@@ -43,6 +46,21 @@
         }
         .btn-primary:disabled, .btn-primary[disabled]{
             background:#334155; box-shadow:none; transform:none; cursor:not-allowed; opacity:.6;
+        }
+        /* New Style for Hebrew text alignment/direction */
+        .hebrew-text {
+            direction: rtl; /* Right-to-Left direction for Hebrew */
+            text-align: right;
+            /* Optionally use a Hebrew-friendly font */
+            font-family: 'Rubik', 'Inter', sans-serif;
+        }
+        /* Override default option button text alignment for Hebrew questions */
+        .hebrew-option .option-button {
+            text-align: right;
+        }
+        /* Ensure the input/textarea field text starts on the right for RTL languages */
+        #answer-input.hebrew-text {
+            text-align: right;
         }
     </style>
 </head>
@@ -82,19 +100,19 @@
             <div id="options-container" class="space-y-4"></div>
 
             <div id="fill-in-container" class="space-y-4 hidden">
-                <input type="text" id="answer-input" placeholder="Type your answer here..."
-                        class="w-full p-4 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none text-xl">
+                <textarea id="answer-input" placeholder="Type your answer here... (Min 150 characters supported)"
+                         class="w-full p-4 rounded-lg bg-slate-700 text-text-light border border-slate-600 focus:ring-primary focus:border-primary placeholder-slate-400 focus:outline-none text-xl h-32"></textarea>
             </div>
 
             <p id="answer-error" class="text-error-text text-sm h-5 text-center"></p>
 
             <div class="mt-8 flex justify-between space-x-4">
                 <button id="prev-btn" onclick="exam.goToPrevQuestion()"
-                         class="bg-slate-600 hover:bg-slate-500 text-text-light font-semibold py-3 px-6 rounded-lg transition disabled:opacity-50"
-                         disabled>Previous</button>
+                             class="bg-slate-600 hover:bg-slate-500 text-text-light font-semibold py-3 px-6 rounded-lg transition disabled:opacity-50"
+                             disabled>Previous</button>
                 <button id="next-btn" onclick="exam.checkAnswerAndAdvance()"
-                         class="btn-primary text-text-light font-semibold py-3 px-6 rounded-lg shadow-lg transition disabled:opacity-50"
-                         disabled>Next Question</button>
+                             class="btn-primary text-text-light font-semibold py-3 px-6 rounded-lg shadow-lg transition disabled:opacity-50"
+                             disabled>Next Question</button>
             </div>
         </div>
 
@@ -142,34 +160,35 @@
         // ---------- ALL 24 QUESTIONS ----------
         const questions = [
             
-    // ================= IT =================
-    { Category: 'IT', Question: 'מהזה מהז מזהמהמהמהקכקכחלכקכדגדגכלדגככדגדגכלחגכילחדגיכלחדגיכלחדיגלכחידגלחכידלגחיכלחדגיכלחדגיכלחדיגכ', A: 'דגכדגכדרכעע', B: 'גכדגכדכדכדגכדגכדגכדגכ', C: 'ןוכןודגכןלידקוןיכלקי', D: 'ךיכקןויכוןיקלכיקןליכדג', CorrectAnswer: 'D' },
-    { Category: 'IT', Question: 'A user reports they cannot print to a network printer, but other users can. What is the most likely first step to troubleshoot the issue on the user\'s PC?', A: 'Restart the print spooler service', B: 'Check the printer\'s IP address', C: 'Reinstall the operating system', D: 'Replace the printer cable', CorrectAnswer: 'A' },
-    { Category: 'IT', Question: 'Which key combination opens the Task Manager in Windows?', A: 'Ctrl + Alt + F4', B: 'Alt + Shift + Del', C: 'Ctrl + Shift + Esc', D: 'Windows Key + R', CorrectAnswer: 'C' },
-    { Category: 'IT', Question: 'What is the purpose of DHCP in a local network?', A: 'Translates domain names to IP addresses', B: 'Manages all network security policies', C: 'Automatically assigns IP addresses to devices', D: 'Encrypts all network traffic', CorrectAnswer: 'C' },
-    { Category: 'IT', Question: 'Name the command-line utility in Windows used to test the reachability of a host on an IP network.', A: '', B: '', C: '', D: '', CorrectAnswer: 'ping' },
+    // ================= IT (Mixed Hebrew/English for test) =================
+    // Note: The first question has been cleaned up and flagged as Hebrew
+    { Category: 'IT', Question: 'מהן הפעולות הראשונות שתבצע כדי לפתור תקלת אינטרנט במחשב של משתמש ששאר הרשת תקינה?', A: 'בדיקת פינג לכתובת ה-Default Gateway', B: 'אתחול ה-PC והראוטר', C: 'בדיקת מצב מתאם הרשת (ipconfig)', D: 'שחזור המערכת לנקודת זמן קודמת', CorrectAnswer: 'A', Language: 'Hebrew' },
+    { Category: 'IT', Question: 'A user reports they cannot print to a network printer, but other users can. What is the most likely first step to troubleshoot the issue on the user\'s PC?', A: 'Restart the print spooler service', B: 'Check the printer\'s IP address', C: 'Reinstall the operating system', D: 'Replace the printer cable', CorrectAnswer: 'A', Language: 'English' },
+    { Category: 'IT', Question: 'Which key combination opens the Task Manager in Windows?', A: 'Ctrl + Alt + F4', B: 'Alt + Shift + Del', C: 'Ctrl + Shift + Esc', D: 'Windows Key + R', CorrectAnswer: 'C', Language: 'English' },
+    { Category: 'IT', Question: 'What is the purpose of DHCP in a local network?', A: 'Translates domain names to IP addresses', B: 'Manages all network security policies', C: 'Automatically assigns IP addresses to devices', D: 'Encrypts all network traffic', CorrectAnswer: 'C', Language: 'English' },
+    { Category: 'IT', Question: 'Name the command-line utility in Windows used to test the reachability of a host on an IP network.', A: '', B: '', C: '', D: '', CorrectAnswer: 'ping', Language: 'English' },
 
     // ================= LINUX =================
-    { Category: 'Linux', Question: 'Which command is used to display the contents of a text file, one screenful at a time?', A: 'cat', B: 'grep', C: 'less', D: 'tail', CorrectAnswer: 'C' },
-    { Category: 'Linux', Question: 'Which file contains the list of local user accounts on a standard Linux system?', A: '/etc/group', B: '/var/log/messages', C: '/etc/passwd', D: '/boot/grub/grub.cfg', CorrectAnswer: 'C' },
-    { Category: 'Linux', Question: 'What command is used to change the permissions of a file (e.g., granting execute permission)?', A: 'chown', B: 'chmod', C: 'chgrp', D: 'ln', CorrectAnswer: 'B' },
-    { Category: 'Linux', Question: 'What does the --rwxr-x--- file permission string mean for the **Group** category?', A: 'Read, Write, and Execute', B: 'Read and Execute', C: 'Read only', D: 'No permissions', CorrectAnswer: 'B' },
-    { Category: 'Linux', Question: 'Name the command used to check the running processes on a Linux system.', A: '', B: '', C: '', D: '', CorrectAnswer: 'ps (or top)' },
+    { Category: 'Linux', Question: 'Which command is used to display the contents of a text file, one screenful at a time?', A: 'cat', B: 'grep', C: 'less', D: 'tail', CorrectAnswer: 'C', Language: 'English' },
+    { Category: 'Linux', Question: 'Which file contains the list of local user accounts on a standard Linux system?', A: '/etc/group', B: '/var/log/messages', C: '/etc/passwd', D: '/boot/grub/grub.cfg', CorrectAnswer: 'C', Language: 'English' },
+    { Category: 'Linux', Question: 'מהי הפקודה המשמשת לשנות את הבעלות על קובץ (משתמש וקבוצה)?', A: 'chmod', B: 'chgrp', C: 'chown', D: 'ln', CorrectAnswer: 'C', Language: 'Hebrew' },
+    { Category: 'Linux', Question: 'What does the --rwxr-x--- file permission string mean for the **Group** category?', A: 'Read, Write, and Execute', B: 'Read and Execute', C: 'Read only', D: 'No permissions', CorrectAnswer: 'B', Language: 'English' },
+    { Category: 'Linux', Question: 'Name the command used to check the running processes on a Linux system.', A: '', B: '', C: '', D: '', CorrectAnswer: 'ps (or top)', Language: 'English' },
 
     // ================= VMWARE =================
-    { Category: 'VMware', Question: 'Which component of the vSphere suite manages the central control plane, allowing you to manage multiple ESXi hosts?', A: 'vCenter Server', B: 'vSphere Client', C: 'vSAN', D: 'vMotion', CorrectAnswer: 'A' },
-    { Category: 'VMware', Question: 'What is the file extension for a VMware virtual disk file?', A: '.vmx', B: '.vmdk', C: '.vswp', D: '.nvram', CorrectAnswer: 'B' },
-    { Category: 'VMware', Question: 'Which feature allows you to move a running virtual machine from one ESXi host to another without downtime?', A: 'Storage vMotion', B: 'High Availability (HA)', C: 'Distributed Resource Scheduler (DRS)', D: 'vMotion', CorrectAnswer: 'D' },
-    { Category: 'VMware', Question: 'What is a Snapshot used for in a virtual machine environment?', A: 'To create a full backup of the VM', B: 'To capture the state, settings, and data of a VM at a specific point in time', C: 'To replicate the VM to a secondary site', D: 'To increase the VM\'s performance', CorrectAnswer: 'B' },
-    { Category: 'VMware', Question: 'Name the protocol or technology that allows multiple physical network adapters to be treated as a single logical link on an ESXi host.', A: '', B: '', C: '', D: '', CorrectAnswer: 'NIC Teaming (or Link Aggregation/LACP)' },
+    { Category: 'VMware', Question: 'Which component of the vSphere suite manages the central control plane, allowing you to manage multiple ESXi hosts?', A: 'vCenter Server', B: 'vSphere Client', C: 'vSAN', D: 'vMotion', CorrectAnswer: 'A', Language: 'English' },
+    { Category: 'VMware', Question: 'What is the file extension for a VMware virtual disk file?', A: '.vmx', B: '.vmdk', C: '.vswp', D: '.nvram', CorrectAnswer: 'B', Language: 'English' },
+    { Category: 'VMware', Question: 'Which feature allows you to move a running virtual machine from one ESXi host to another without downtime?', A: 'Storage vMotion', B: 'High Availability (HA)', C: 'Distributed Resource Scheduler (DRS)', D: 'vMotion', CorrectAnswer: 'D', Language: 'English' },
+    { Category: 'VMware', Question: 'What is a Snapshot used for in a virtual machine environment?', A: 'To create a full backup of the VM', B: 'To capture the state, settings, and data of a VM at a specific point in time', C: 'To replicate the VM to a secondary site', D: 'To increase the VM\'s performance', CorrectAnswer: 'B', Language: 'English' },
+    { Category: 'VMware', Question: 'Describe, in detail, the difference between VMware HA (High Availability) and FT (Fault Tolerance) and when you would use each.', A: '', B: '', C: '', D: '', CorrectAnswer: 'HA provides automatic restart after failure, causing brief downtime. FT provides continuous availability with zero downtime using a mirrored secondary VM. Use HA for most workloads; use FT only for mission-critical apps that cannot tolerate any downtime.', Language: 'English' },
 
     // ================= NETWORK =================
-    { Category: 'Network', Question: 'In the OSI Model, which layer is responsible for logical addressing (IP addresses)?', A: 'Layer 2 (Data Link)', B: 'Layer 3 (Network)', C: 'Layer 4 (Transport)', D: 'Layer 7 (Application)', CorrectAnswer: 'B' },
-    { Category: 'Network', Question: 'Which device operates primarily at Layer 2 of the OSI model and forwards data based on MAC addresses?', A: 'Router', B: 'Hub', C: 'Firewall', D: 'Switch', CorrectAnswer: 'D' },
-    { Category: 'Network', Question: 'What is the port number commonly used by HTTPS (Hypertext Transfer Protocol Secure)?', A: '21', B: '80', C: '443', D: '23', CorrectAnswer: 'C' },
-    { Category: 'Network', Question: 'What is the purpose of a subnet mask in an IPv4 network?', A: 'To identify the default gateway', B: 'To distinguish the network portion from the host portion of an IP address', C: 'To encrypt the network traffic', D: 'To assign IP addresses dynamically', CorrectAnswer: 'B' },
-    { Category: 'Network', Question: 'Name the command-line utility used to view the IP configuration (IP address, subnet mask, default gateway) of a network adapter on a Windows machine.', A: '', B: '', C: '', D: '', CorrectAnswer: 'ipconfig' },
-                     ];
+    { Category: 'Network', Question: 'In the OSI Model, which layer is responsible for logical addressing (IP addresses)?', A: 'Layer 2 (Data Link)', B: 'Layer 3 (Network)', C: 'Layer 4 (Transport)', D: 'Layer 7 (Application)', CorrectAnswer: 'B', Language: 'English' },
+    { Category: 'Network', Question: 'Which device operates primarily at Layer 2 of the OSI model and forwards data based on MAC addresses?', A: 'Router', B: 'Hub', C: 'Firewall', D: 'Switch', CorrectAnswer: 'D', Language: 'English' },
+    { Category: 'Network', Question: 'מהו הפורט הנפוץ ביותר המשמש את פרוטוקול RDP (Remote Desktop Protocol) לצורך גישה מרחוק?', A: '22', B: '3389', C: '8080', D: '23', CorrectAnswer: 'B', Language: 'Hebrew' },
+    { Category: 'Network', Question: 'What is the purpose of a subnet mask in an IPv4 network?', A: 'To identify the default gateway', B: 'To distinguish the network portion from the host portion of an IP address', C: 'To encrypt the network traffic', D: 'To assign IP addresses dynamically', CorrectAnswer: 'B', Language: 'English' },
+    { Category: 'Network', Question: 'Name the command-line utility used to view the IP configuration (IP address, subnet mask, default gateway) of a network adapter on a Windows machine.', A: '', B: '', C: '', D: '', CorrectAnswer: 'ipconfig', Language: 'English' }
+        ];
 
         // ---------- Global State ----------
         let currentQuestionIndex = 0;
@@ -177,7 +196,7 @@
         let employeeName = '';
         let score = 0;
 
-        const KEYS = { QUESTION:'Question', CATEGORY:'Category', A:'A', B:'B', C:'C', D:'D', CORRECT:'CorrectAnswer' };
+        const KEYS = { QUESTION:'Question', CATEGORY:'Category', A:'A', B:'B', C:'C', D:'D', CORRECT:'CorrectAnswer', LANGUAGE: 'Language' };
 
         // ---------- DOM ----------
         const startScreen   = document.getElementById('start-screen');
@@ -186,12 +205,17 @@
         const startStatus   = document.getElementById('start-status');
         const nextButton    = document.getElementById('next-btn');
         const prevButton    = document.getElementById('prev-btn');
-        const answerInput   = document.getElementById('answer-input');
+        const answerInput   = document.getElementById('answer-input'); // This is now a TEXTAREA
         const refIdDisplay  = document.getElementById('ref-id-display');
 
         // ---------- Helper ----------
         function calculateFinalScore() {
             return userAnswers.reduce((s, a) => s + (a.isCorrect ? 1 : 0), 0);
+        }
+        
+        // Helper to check if the question is in Hebrew
+        function isHebrew(q) {
+            return q[KEYS.LANGUAGE] === 'Hebrew';
         }
 
         // ---------- Expose Functions Globally ----------
@@ -225,7 +249,8 @@
                 options: { A:q[KEYS.A], B:q[KEYS.B], C:q[KEYS.C], D:q[KEYS.D] }, 
                 selected: null,
                 correct: q[KEYS.CORRECT],
-                isCorrect: false
+                isCorrect: false,
+                language: q[KEYS.LANGUAGE] // Store language property
             }));
 
             startScreen.classList.add('hidden');
@@ -240,9 +265,20 @@
             const q = questions[currentQuestionIndex];
             const attempt = userAnswers[currentQuestionIndex];
             const total = questions.length;
+            const isQHebrew = isHebrew(q); // Check language for current question
 
             document.getElementById('question-number').textContent = `Question ${currentQuestionIndex+1}/${total}`;
-            document.getElementById('question-text').textContent   = q[KEYS.QUESTION];
+            
+            // Apply Hebrew/RTL class to question text
+            const questionTextEl = document.getElementById('question-text');
+            questionTextEl.textContent = q[KEYS.QUESTION];
+            if (isQHebrew) {
+                questionTextEl.classList.add('hebrew-text');
+            } else {
+                questionTextEl.classList.remove('hebrew-text');
+            }
+
+
             document.getElementById('question-category').textContent = q[KEYS.CATEGORY] ? `Category: ${q[KEYS.CATEGORY]}` : 'Category: General';
 
             const opts = document.getElementById('options-container');
@@ -253,14 +289,34 @@
             answerInput.value = '';
             err.textContent = '';
 
+            // Apply Hebrew/RTL class to options container/fill-in container
+            if (isQHebrew) {
+                opts.classList.add('hebrew-option');
+                answerInput.classList.add('hebrew-text');
+            } else {
+                opts.classList.remove('hebrew-option');
+                answerInput.classList.remove('hebrew-text');
+            }
+
+
             if (attempt.isMCQ) {
                 opts.classList.remove('hidden'); fill.classList.add('hidden');
                 ['A','B','C','D'].forEach(k => {
                     if (!q[k]) return;
                     const btn = document.createElement('button');
                     btn.textContent = `${k}. ${q[k]}`;
-                    btn.className = `option-button w-full text-left p-4 rounded-lg bg-slate-700 hover:bg-primary/50 transition shadow-md font-medium`;
-                    if (attempt.selected === k) btn.className = `option-button w-full text-left p-4 rounded-lg bg-selection ring-2 ring-primary/50 transition shadow-md font-medium`;
+                    
+                    // Determine button class based on language
+                    let btnClass = `option-button w-full p-4 rounded-lg bg-slate-700 hover:bg-primary/50 transition shadow-md font-medium`;
+                    if (isQHebrew) {
+                         btnClass += ' text-right'; // Override default text-left for Hebrew options
+                    } else {
+                         btnClass += ' text-left';
+                    }
+
+                    if (attempt.selected === k) btnClass = btnClass.replace('bg-slate-700','bg-selection ring-2 ring-primary/50');
+                    
+                    btn.className = btnClass;
                     btn.onclick = () => selectMCQAnswer(k);
                     btn.id = `option-${k}`;
                     opts.appendChild(btn);
@@ -308,9 +364,13 @@
             const txt = answerInput.value.trim();
             attempt.selected = txt;
             if (txt) {
-                const norm = txt.toLowerCase();
-                const correct = q[KEYS.CORRECT].split('|').map(c=>c.trim().toLowerCase());
-                attempt.isCorrect = correct.includes(norm);
+                // NOTE: For open-ended questions, the scoring is basic (text match) 
+                // and will usually be reviewed manually. We keep the basic matching for now.
+                const norm = txt.toLowerCase().split('|').map(c=>c.trim().toLowerCase()).filter(Boolean); // Handle multiple correct answers
+                const correct = q[KEYS.CORRECT].toLowerCase().split('|').map(c=>c.trim().toLowerCase());
+                
+                // Simple check for now: Is the selected answer one of the accepted correct answers?
+                attempt.isCorrect = correct.some(c => norm.includes(c)); 
             } else {
                 attempt.isCorrect = false;
             }
@@ -346,15 +406,16 @@
             const total = questions.length;
             const percentage = total ? ((finalScore/total)*100).toFixed(1) : 0;
             
-            // --- CRITICAL CHANGE HERE: Include the 'options' object in the data sent to Firestore
+            // CRITICAL CHANGE HERE: Include the 'options' object in the data sent to Firestore
             const answersData = userAnswers.map(a => ({
                 question: a.question,
                 category: a.category,
                 isMCQ: a.isMCQ,
-                options: a.options, // <--- THIS IS THE FIX
+                options: a.options, // <--- This stores A, B, C, D text
                 selected: a.selected,
                 correct: a.correct,
-                isCorrect: a.isCorrect
+                isCorrect: a.isCorrect,
+                language: a.language // New field
             }));
             
             const data = {
@@ -363,7 +424,7 @@
                 total,
                 percentage,
                 timestamp: new Date().toISOString(),
-                answers: answersData // Use the modified answers array
+                answers: answersData 
             };
             
             try {
@@ -419,9 +480,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
