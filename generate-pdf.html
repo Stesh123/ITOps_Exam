@@ -169,29 +169,49 @@
         const userFullAnswer = getFullAnswer(a, 'selected');
         const correctFullAnswer = getFullAnswer(a, 'correct');
 
-        // Apply RTL styles if it's a Hebrew question
+        // Styles for RTL flow (Hebrew)
         const rtlStyle = isHebrewQuestion ? 'direction:rtl; text-align:right;' : '';
+        // Styles for answer containers to ensure word wrapping and proper display flow
+        const ansContainerStyle = `
+            padding:10px 14px;
+            border-radius:8px;
+            margin:6px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            ${isHebrewQuestion ? 'direction:rtl;' : 'direction:ltr;'}
+        `;
+        // Styles for the answer text itself to ensure word breaking/wrapping
+        const ansTextStyle = `
+            flex-grow: 1; 
+            margin-left: 10px; 
+            ${isHebrewQuestion ? 'margin-right: 10px; margin-left: 0; text-align: right;' : 'text-align: left;'} 
+            word-wrap: break-word; 
+            word-break: break-word;
+        `;
 
-        let block = `<div style="border:1px solid #e5e7eb;padding:18px;margin:18px 0;border-radius:12px;background:#fff;${rtlStyle}">
-          <p style="font-weight:700;font-size:16px;margin:0 0 12px;color:#1f2937;${rtlStyle}">
+
+        // Key fix for page cuts: page-break-inside: avoid;
+        let block = `<div style="border:1px solid #e5e7eb;padding:18px;margin:18px 0;border-radius:12px;background:#fff;${rtlStyle} page-break-inside: avoid; break-inside: avoid;">
+          <p style="font-weight:700;font-size:16px;margin:0 0 12px;color:#1f2937;${rtlStyle} word-wrap: break-word; word-break: break-word;">
             ${i+1}. <span style="color:#4f46e5;">[${a.category}]</span> ${escape(a.question)}
           </p>`;
 
-        // Apply RTL styles to the answer blocks as well, so text flows correctly
-        const ansRTLStyle = isHebrewQuestion ? 'direction:rtl; text-align:right;' : 'text-align:left;';
-        
         if (isMCQ) {
           // --- MULTIPLE CHOICE QUESTION LOGIC (MCQ) ---
           if (a.isCorrect) {
-            block += `<div style="background:#ecfdf5;padding:10px 14px;border-radius:8px;margin:6px 0;color:#065f46;border:1px solid #a7f3d0;${ansRTLStyle}">
-              <strong>CORRECT:</strong> ${userFullAnswer}
+            block += `<div style="${ansContainerStyle} background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;">
+                <strong style="flex-shrink: 0;">CORRECT:</strong> 
+                <span style="${ansTextStyle}">${userFullAnswer}</span>
             </div>`;
           } else {
-            block += `<div style="background:#fef2f2;padding:10px 14px;border-radius:8px;margin:6px 0;color:#991b1b;border:1px solid #fecaca;${ansRTLStyle}">
-              <strong>YOUR ANSWER:</strong> ${userFullAnswer}
+            block += `<div style="${ansContainerStyle} background:#fef2f2;color:#991b1b;border:1px solid #fecaca;">
+                <strong style="flex-shrink: 0;">YOUR ANSWER:</strong> 
+                <span style="${ansTextStyle}">${userFullAnswer}</span>
             </div>
-            <div style="background:#f0fdf4;padding:10px 14px;border-radius:8px;margin:6px 0;color:#166534;border:1px solid #bbf7d0;${ansRTLStyle}">
-              <strong>CORRECT:</strong> ${correctFullAnswer}
+            <div style="${ansContainerStyle} background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;">
+                <strong style="flex-shrink: 0;">CORRECT:</strong> 
+                <span style="${ansTextStyle}">${correctFullAnswer}</span>
             </div>`;
           }
         } else {
@@ -201,15 +221,18 @@
           const correctAnsText = a.correct ? escape(a.correct.split('|').join(', ')) : 'N/A';
 
           if (a.isCorrect) {
-            block += `<div style="background:#ecfdf5;padding:10px 14px;border-radius:8px;margin:6px 0;color:#065f46;border:1px solid #a7f3d0;${ansRTLStyle}">
-              <strong>YOUR ANSWER (Correct):</strong> ${userAns}
+            block += `<div style="${ansContainerStyle} background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0;">
+                <strong style="flex-shrink: 0;">YOUR ANSWER (Correct):</strong>
+                <span style="${ansTextStyle}">${userAns}</span>
             </div>`;
           } else {
-            block += `<div style="background:#fef2f2;padding:10px 14px;border-radius:8px;margin:6px 0;color:#991b1b;border:1px solid #fecaca;${ansRTLStyle}">
-              <strong>YOUR ANSWER:</strong> ${userAns}
+            block += `<div style="${ansContainerStyle} background:#fef2f2;color:#991b1b;border:1px solid #fecaca;">
+                <strong style="flex-shrink: 0;">YOUR ANSWER:</strong> 
+                <span style="${ansTextStyle}">${userAns}</span>
             </div>
-            <div style="background:#f0fdf4;padding:10px 14px;border-radius:8px;margin:6px 0;color:#166534;border:1px solid #bbf7d0;${ansRTLStyle}">
-              <strong>CORRECT:</strong> ${correctAnsText}
+            <div style="${ansContainerStyle} background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;">
+                <strong style="flex-shrink: 0;">CORRECT:</strong> 
+                <span style="${ansTextStyle}">${correctAnsText}</span>
             </div>`;
           }
         }
@@ -225,7 +248,7 @@
       <head>
         <meta charset="utf-8">
         <style>
-          /* Import a font that supports Hebrew characters well */
+          /* Use Rubik for better Hebrew support */
           @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Rubik:wght@400;700&display=swap');
           body { font-family: 'Rubik', 'Inter', sans-serif; margin: 0; padding: 50px; color: #1f2937; background: #f9fafb; line-height: 1.7; }
           h1 { color: #4f46e5; font-size: 32px; text-align: center; margin: 0 0 20px; padding-bottom: 12px; border-bottom: 3px solid #e5e7eb; }
