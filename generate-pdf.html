@@ -5,13 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ITOps PDF Generator</title>
 
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- html2pdf -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
 
-  <!-- Inter Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 
   <style>
@@ -28,7 +25,7 @@
       <div>
         <label class="block text-sm font-semibold text-gray-700 mb-2">Firestore Document ID</label>
         <input type="text" id="docId" placeholder="e.g. L1a2B3c4D5e6F7g8H9i0" 
-               class="w-full p-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg">
+              class="w-full p-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg">
         <p class="text-xs text-gray-500 mt-2">Copy from Firestore → examResults → Document ID</p>
       </div>
 
@@ -41,11 +38,9 @@
     <div id="status" class="mt-8 text-center text-lg font-medium"></div>
   </div>
 
-  <!-- Firebase Compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
-  <!-- Main Script -->
   <script>
     // Initialize Firebase
     const firebaseConfig = {
@@ -76,6 +71,8 @@
       btn.textContent = 'Fetching...';
       status.innerHTML = '<p class="text-blue-600">Connecting to Firestore...</p>';
 
+      let iframe = null; // Declare iframe outside the try block for access in finally
+
       try {
         const docRef = db.collection('examResults').doc(docId);
         const docSnap = await docRef.get();
@@ -88,13 +85,14 @@
         }
 
         const data = docSnap.data();
+        data.docId = docId; // Add docId to data object for display in footer
         status.innerHTML = '<p class="text-green-600">Generating PDF...</p>';
 
         // Build HTML
         const html = buildPDFHTML(data);
 
-        // Create iframe
-        let iframe = document.createElement('iframe');
+        // Create and append iframe
+        iframe = document.createElement('iframe');
         iframe.style.position = 'absolute';
         iframe.style.left = '-9999px';
         iframe.style.width = '794px';
@@ -108,6 +106,7 @@
 
         // Wait for load
         await new Promise(resolve => iframe.onload = resolve);
+        // Wait for fonts to be ready
         await document.fonts.ready;
 
         const fileName = `${data.employeeName.replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_')}_Assessment_${new Date(data.timestamp).toISOString().slice(0,10)}.pdf`;
@@ -129,38 +128,71 @@
       } finally {
         btn.disabled = false;
         btn.textContent = 'Generate & Download PDF';
-        const iframe = document.querySelector('iframe');
+        // Remove iframe after generation
         if (iframe) iframe.remove();
       }
     };
 
+    /**
+     * Builds the HTML content for the PDF using data fetched from Firestore.
+     * @param {object} data - The exam results data.
+     * @returns {string} The complete HTML string for the PDF.
+     */
     function buildPDFHTML(data) {
       const date = new Date(data.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
       const answers = data.answers || [];
 
+      // Helper function to escape HTML special characters
+      function escape(str) {
+        if (typeof str !== 'string') return str;
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+      
+      // Helper function to get the full answer string (e.g., "A - OSPF" or "CQRS")
+      function getFullAnswer(answerObj, key) { 
+          const val = answerObj[key];
+          // Check if it's an MCQ and we have the options stored in the object
+          if (val && answerObj.options && answerObj.options[val] && /^[A-D]$/.test(val)) {
+              return `${val} - ${escape(answerObj.options[val])}`;
+          }
+          // For Fill-in-the-Blank, just return the escaped value
+          return escape(val || 'N/A');
+      }
+
       let answerBlocks = '';
       answers.forEach((a, i) => {
-        const isMCQ = a.selected && /^[A-D]$/.test(a.selected);
+        // Use the presence of 'options' and the format of 'selected' to guess if it's MCQ
+        const isMCQ = a.options && a.selected && /^[A-D]$/.test(a.selected);
+        const userFullAnswer = getFullAnswer(a, 'selected');
+        const correctFullAnswer = getFullAnswer(a, 'correct');
+
         let block = `<div style="border:1px solid #e5e7eb;padding:18px;margin:18px 0;border-radius:12px;background:#fff;">
           <p style="font-weight:700;font-size:16px;margin:0 0 12px;color:#1f2937;">
             ${i+1}. <span style="color:#4f46e5;">[${a.category}]</span> ${escape(a.question)}
           </p>`;
 
         if (isMCQ) {
+          // --- MULTIPLE CHOICE QUESTION LOGIC (MCQ) ---
           if (a.isCorrect) {
             block += `<div style="background:#ecfdf5;padding:10px 14px;border-radius:8px;margin:6px 0;color:#065f46;border:1px solid #a7f3d0;">
-              <strong>CORRECT:</strong> ${a.selected}
+              <strong>CORRECT:</strong> ${userFullAnswer}
             </div>`;
           } else {
             block += `<div style="background:#fef2f2;padding:10px 14px;border-radius:8px;margin:6px 0;color:#991b1b;border:1px solid #fecaca;">
-              <strong>YOUR ANSWER:</strong> ${a.selected}
+              <strong>YOUR ANSWER:</strong> ${userFullAnswer}
             </div>
             <div style="background:#f0fdf4;padding:10px 14px;border-radius:8px;margin:6px 0;color:#166534;border:1px solid #bbf7d0;">
-              <strong>CORRECT:</strong> ${a.correct}
+              <strong>CORRECT:</strong> ${correctFullAnswer}
             </div>`;
           }
         } else {
-          const userAns = a.selected ? escape(a.selected) : "<em style='color:#9ca3af'>No answer</em>";
+          // --- FILL-IN-THE-BLANK QUESTION LOGIC ---
+          const userAns = a.selected ? userFullAnswer : "<em style='color:#9ca3af'>No answer</em>";
+          // For correct fill-in answer, handle potential multiple correct answers separated by '|'
+          const correctAnsText = a.correct ? escape(a.correct.split('|').join(', ')) : 'N/A';
+
           if (a.isCorrect) {
             block += `<div style="background:#ecfdf5;padding:10px 14px;border-radius:8px;margin:6px 0;color:#065f46;border:1px solid #a7f3d0;">
               <strong>YOUR ANSWER (Correct):</strong> ${userAns}
@@ -170,7 +202,7 @@
               <strong>YOUR ANSWER:</strong> ${userAns}
             </div>
             <div style="background:#f0fdf4;padding:10px 14px;border-radius:8px;margin:6px 0;color:#166534;border:1px solid #bbf7d0;">
-              <strong>CORRECT:</strong> ${escape(a.correct.split('|').join(', '))}
+              <strong>CORRECT:</strong> ${correctAnsText}
             </div>`;
           }
         }
@@ -191,6 +223,7 @@
           .header { text-align: center; margin-bottom: 40px; }
           .score-box { border: 2px solid #d1d5db; padding: 24px; border-radius: 16px; text-align: center; background: #f3f4f6; margin: 0 auto 40px; max-width: 400px; }
           .score-number { font-size: 64px; font-weight: 900; color: ${scoreColor}; margin: 12px 0; }
+          .score-percentage { font-size: 20px; font-weight: 700; }
           .footer { margin-top: 60px; text-align: center; color: #6b7280; font-size: 14px; }
         </style>
       </head>
@@ -204,23 +237,17 @@
         <div class="score-box">
           <h2 style="margin:0;font-size:20px;color:#374151;">Final Score</h2>
           <div class="score-number">${data.score}/${data.total}</div>
-          <p style="margin:8px 0;font-size:20px;font-weight:700;"><strong>${data.percentage}%</strong></p>
+          <p class="score-percentage" style="margin:8px 0;"><strong>${data.percentage}%</strong></p>
         </div>
 
         <h2 style="color:#374151;font-size:22px;margin:40px 0 20px;border-bottom:2px solid #e5e7eb;padding-bottom:10px;">Detailed Answers</h2>
         ${answerBlocks}
 
         <div class="footer">
-          <p>Generated from Firestore • Powered by Stas Shnaider</p>
+          <p>Generated from Firestore • Powered by Stas Shnaider • Ref ID: ${escape(data.docId || 'N/A')}</p>
         </div>
       </body>
       </html>`;
-    }
-
-    function escape(str) {
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
     }
   </script>
 </body>
