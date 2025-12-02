@@ -151,26 +151,23 @@
             }
             
             // Helper function to get the full answer string (e.g., "A - OSPF" or "CQRS")
-            // This is updated to use the full selected text, which may contain newlines.
             function getFullAnswer(answerObj, key) { 
                 const val = answerObj[key];
                 // Check if it's an MCQ and we have the options stored in the object
                 if (val && answerObj.options && answerObj.options[val] && /^[A-D]$/.test(val)) {
-                    // Use the escaped option text for MCQs
                     return `${val} - ${escape(answerObj.options[val])}`; 
                 }
-                // For Fill-in-the-Blank, just return the raw, potentially multi-line string
+                // For Fill-in-the-Blank, just return the raw value
                 return val || 'N/A'; 
             }
 
             let answerBlocks = '';
             answers.forEach((a, i) => {
-                // Use the presence of 'options' and the format of 'selected' to guess if it's MCQ
                 const isMCQ = a.options && a.selected && /^[A-D]$/.test(a.selected);
                 const userFullAnswer = getFullAnswer(a, 'selected');
                 const correctFullAnswer = getFullAnswer(a, 'correct');
 
-                // *** FIX 2: Added page-break-inside: avoid; to prevent cutting question block ***
+                // FIX 2: Added page-break-inside: avoid; to prevent cutting question block (Already implemented and kept)
                 let block = `<div style="border:1px solid #e5e7eb;padding:18px;margin:18px 0;border-radius:12px;background:#fff; page-break-inside: avoid;">
                     <p style="font-weight:700;font-size:16px;margin:0 0 12px;color:#1f2937;">
                         ${i+1}. <span style="color:#4f46e5;">[${a.category}]</span> ${escape(a.question)}
@@ -192,25 +189,27 @@
                     }
                 } else {
                     // --- FILL-IN-THE-BLANK QUESTION LOGIC ---
-                    // NOTE: getFullAnswer for fill-in questions returns unescaped string, potentially with newlines.
-                    // We must escape it here before injection, and apply the pre-wrap style.
-                    const escapedUserAns = escape(a.selected || '');
-                    const userAnsDisplay = escapedUserAns ? escapedUserAns : "<em style='color:#9ca3af'>No answer</em>";
+                    
+                    // FIX 1: Replace \n with <br> for explicit newlines in PDF output
+                    const userAnsHTML = escape(a.selected || '').replace(/\n/g, '<br>'); 
+                    const userAnsDisplay = userAnsHTML ? userAnsHTML : "<em style='color:#9ca3af'>No answer</em>";
+
                     // For correct fill-in answer, handle potential multiple correct answers separated by '|'
                     const correctAnsText = a.correct ? escape(a.correct.split('|').join(', ')) : 'N/A';
                     
-                    // *** FIX 1: Applied white-space: pre-wrap; to display the answer exactly as typed, preserving newlines ***
-                    const whitespaceStyle = "white-space: pre-wrap; word-break: break-word; font-family: monospace; font-size: 14px;"; 
+                    // Removed white-space: pre-wrap; since we are using <br> for newlines now.
+                    // Kept word-break for long lines and font-size for readability.
+                    const textStyle = "word-break: break-word; font-size: 14px;"; 
 
                     if (a.isCorrect) {
-                        block += `<div style="background:#ecfdf5;padding:10px 14px;border-radius:8px;margin:6px 0;color:#065f46;border:1px solid #a7f3d0; ${whitespaceStyle}">
+                        block += `<div style="background:#ecfdf5;padding:10px 14px;border-radius:8px;margin:6px 0;color:#065f46;border:1px solid #a7f3d0; ${textStyle}">
                             <strong>YOUR ANSWER (Correct):</strong> ${userAnsDisplay}
                         </div>`;
                     } else {
-                        block += `<div style="background:#fef2f2;padding:10px 14px;border-radius:8px;margin:6px 0;color:#991b1b;border:1px solid #fecaca; ${whitespaceStyle}">
+                        block += `<div style="background:#fef2f2;padding:10px 14px;border-radius:8px;margin:6px 0;color:#991b1b;border:1px solid #fecaca; ${textStyle}">
                             <strong>YOUR ANSWER:</strong> ${userAnsDisplay}
                         </div>
-                        <div style="background:#f0fdf4;padding:10px 14px;border-radius:8px;margin:6px 0;color:#166534;border:1px solid #bbf7d0; ${whitespaceStyle}">
+                        <div style="background:#f0fdf4;padding:10px 14px;border-radius:8px;margin:6px 0;color:#166534;border:1px solid #bbf7d0; ${textStyle}">
                             <strong>CORRECT:</strong> ${correctAnsText}
                         </div>`;
                     }
