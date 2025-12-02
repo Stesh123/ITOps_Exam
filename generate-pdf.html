@@ -151,14 +151,16 @@
             }
             
             // Helper function to get the full answer string (e.g., "A - OSPF" or "CQRS")
+            // This is updated to use the full selected text, which may contain newlines.
             function getFullAnswer(answerObj, key) { 
                 const val = answerObj[key];
                 // Check if it's an MCQ and we have the options stored in the object
                 if (val && answerObj.options && answerObj.options[val] && /^[A-D]$/.test(val)) {
-                    return `${val} - ${escape(answerObj.options[val])}`;
+                    // Use the escaped option text for MCQs
+                    return `${val} - ${escape(answerObj.options[val])}`; 
                 }
-                // For Fill-in-the-Blank, just return the escaped value
-                return escape(val || 'N/A');
+                // For Fill-in-the-Blank, just return the raw, potentially multi-line string
+                return val || 'N/A'; 
             }
 
             let answerBlocks = '';
@@ -168,7 +170,8 @@
                 const userFullAnswer = getFullAnswer(a, 'selected');
                 const correctFullAnswer = getFullAnswer(a, 'correct');
 
-                let block = `<div style="border:1px solid #e5e7eb;padding:18px;margin:18px 0;border-radius:12px;background:#fff;">
+                // *** FIX 2: Added page-break-inside: avoid; to prevent cutting question block ***
+                let block = `<div style="border:1px solid #e5e7eb;padding:18px;margin:18px 0;border-radius:12px;background:#fff; page-break-inside: avoid;">
                     <p style="font-weight:700;font-size:16px;margin:0 0 12px;color:#1f2937;">
                         ${i+1}. <span style="color:#4f46e5;">[${a.category}]</span> ${escape(a.question)}
                     </p>`;
@@ -189,20 +192,23 @@
                     }
                 } else {
                     // --- FILL-IN-THE-BLANK QUESTION LOGIC ---
-                    const userAns = a.selected ? userFullAnswer : "<em style='color:#9ca3af'>No answer</em>";
+                    // NOTE: getFullAnswer for fill-in questions returns unescaped string, potentially with newlines.
+                    // We must escape it here before injection, and apply the pre-wrap style.
+                    const escapedUserAns = escape(a.selected || '');
+                    const userAnsDisplay = escapedUserAns ? escapedUserAns : "<em style='color:#9ca3af'>No answer</em>";
                     // For correct fill-in answer, handle potential multiple correct answers separated by '|'
                     const correctAnsText = a.correct ? escape(a.correct.split('|').join(', ')) : 'N/A';
                     
-                    // Style to preserve new lines for the user's answer (Fill-in-the-Blank)
-                    const whitespaceStyle = "white-space: pre-wrap; word-break: break-word;"; 
+                    // *** FIX 1: Applied white-space: pre-wrap; to display the answer exactly as typed, preserving newlines ***
+                    const whitespaceStyle = "white-space: pre-wrap; word-break: break-word; font-family: monospace; font-size: 14px;"; 
 
                     if (a.isCorrect) {
                         block += `<div style="background:#ecfdf5;padding:10px 14px;border-radius:8px;margin:6px 0;color:#065f46;border:1px solid #a7f3d0; ${whitespaceStyle}">
-                            <strong>YOUR ANSWER (Correct):</strong> ${userAns}
+                            <strong>YOUR ANSWER (Correct):</strong> ${userAnsDisplay}
                         </div>`;
                     } else {
                         block += `<div style="background:#fef2f2;padding:10px 14px;border-radius:8px;margin:6px 0;color:#991b1b;border:1px solid #fecaca; ${whitespaceStyle}">
-                            <strong>YOUR ANSWER:</strong> ${userAns}
+                            <strong>YOUR ANSWER:</strong> ${userAnsDisplay}
                         </div>
                         <div style="background:#f0fdf4;padding:10px 14px;border-radius:8px;margin:6px 0;color:#166534;border:1px solid #bbf7d0; ${whitespaceStyle}">
                             <strong>CORRECT:</strong> ${correctAnsText}
@@ -221,6 +227,9 @@
             <head>
                 <meta charset="utf-8">
                 <style>
+                    /* Custom font-family import for PDF rendering */
+                    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+                    
                     body { font-family: 'Inter', sans-serif; margin: 0; padding: 50px; color: #1f2937; background: #f9fafb; line-height: 1.7; }
                     h1 { color: #4f46e5; font-size: 32px; text-align: center; margin: 0 0 20px; padding-bottom: 12px; border-bottom: 3px solid #e5e7eb; }
                     .header { text-align: center; margin-bottom: 40px; }
