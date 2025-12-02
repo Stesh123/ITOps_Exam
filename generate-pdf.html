@@ -163,11 +163,12 @@
 
             let answerBlocks = '';
             answers.forEach((a, i) => {
+                // Check if the question is an MCQ (has options and the selected answer is A, B, C, or D)
                 const isMCQ = a.options && a.selected && /^[A-D]$/.test(a.selected);
                 const userFullAnswer = getFullAnswer(a, 'selected');
                 const correctFullAnswer = getFullAnswer(a, 'correct');
 
-                // FIX 2: Added page-break-inside: avoid; to prevent cutting question block (Already implemented and kept)
+                // Added page-break-inside: avoid; to prevent cutting question block
                 let block = `<div style="border:1px solid #e5e7eb;padding:18px;margin:18px 0;border-radius:12px;background:#fff; page-break-inside: avoid;">
                     <p style="font-weight:700;font-size:16px;margin:0 0 12px;color:#1f2937;">
                         ${i+1}. <span style="color:#4f46e5;">[${a.category}]</span> ${escape(a.question)}
@@ -188,31 +189,19 @@
                         </div>`;
                     }
                 } else {
-                    // --- FILL-IN-THE-BLANK QUESTION LOGIC ---
+                    // --- FILL-IN-THE-BLANK / OPEN QUESTION LOGIC (MODIFIED) ---
                     
-                    // FIX 1: Replace \n with <br> for explicit newlines in PDF output
+                    // Replace \n with <br> for explicit newlines in PDF output
                     const userAnsHTML = escape(a.selected || '').replace(/\n/g, '<br>'); 
                     const userAnsDisplay = userAnsHTML ? userAnsHTML : "<em style='color:#9ca3af'>No answer</em>";
 
-                    // For correct fill-in answer, handle potential multiple correct answers separated by '|'
-                    const correctAnsText = a.correct ? escape(a.correct.split('|').join(', ')) : 'N/A';
-                    
-                    // Removed white-space: pre-wrap; since we are using <br> for newlines now.
-                    // Kept word-break for long lines and font-size for readability.
                     const textStyle = "word-break: break-word; font-size: 14px;"; 
 
-                    if (a.isCorrect) {
-                        block += `<div style="background:#ecfdf5;padding:10px 14px;border-radius:8px;margin:6px 0;color:#065f46;border:1px solid #a7f3d0; ${textStyle}">
-                            <strong>YOUR ANSWER (Correct):</strong> ${userAnsDisplay}
-                        </div>`;
-                    } else {
-                        block += `<div style="background:#fef2f2;padding:10px 14px;border-radius:8px;margin:6px 0;color:#991b1b;border:1px solid #fecaca; ${textStyle}">
-                            <strong>YOUR ANSWER:</strong> ${userAnsDisplay}
-                        </div>
-                        <div style="background:#f0fdf4;padding:10px 14px;border-radius:8px;margin:6px 0;color:#166534;border:1px solid #bbf7d0; ${textStyle}">
-                            <strong>CORRECT:</strong> ${correctAnsText}
-                        </div>`;
-                    }
+                    // Always display the employee answer in the green box (as if correct/neutral)
+                    // and omit the 'Correct' answer to enable manual review.
+                    block += `<div style="background:#ecfdf5;padding:10px 14px;border-radius:8px;margin:6px 0;color:#065f46;border:1px solid #a7f3d0; ${textStyle}">
+                        <strong>EMPLOYEE ANSWER:</strong> ${userAnsDisplay}
+                    </div>`;
                 }
                 block += `</div>`;
                 answerBlocks += block;
