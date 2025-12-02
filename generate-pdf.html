@@ -189,17 +189,19 @@
                         </div>`;
                     }
                 } else {
-                    // --- FILL-IN-THE-BLANK / OPEN QUESTION LOGIC (MODIFIED) ---
+                    // --- FILL-IN-THE-BLANK / OPEN QUESTION LOGIC (MODIFIED FOR BLUE COLOR) ---
                     
                     // Replace \n with <br> for explicit newlines in PDF output
                     const userAnsHTML = escape(a.selected || '').replace(/\n/g, '<br>'); 
                     const userAnsDisplay = userAnsHTML ? userAnsHTML : "<em style='color:#9ca3af'>No answer</em>";
 
                     const textStyle = "word-break: break-word; font-size: 14px;"; 
-
-                    // Always display the employee answer in the green box (as if correct/neutral)
-                    // and omit the 'Correct' answer to enable manual review.
-                    block += `<div style="background:#ecfdf5;padding:10px 14px;border-radius:8px;margin:6px 0;color:#065f46;border:1px solid #a7f3d0; ${textStyle}">
+                    
+                    // NEW COLOR STYLES: 
+                    // Background: #eef2ff (indigo-50/blue-50)
+                    // Text Color: #3730a3 (indigo-700)
+                    // Border Color: #c7d2fe (indigo-300)
+                    block += `<div style="background:#eef2ff;padding:10px 14px;border-radius:8px;margin:6px 0;color:#3730a3;border:1px solid #c7d2fe; ${textStyle}">
                         <strong>ANSWER:</strong> ${userAnsDisplay}
                     </div>`;
                 }
@@ -252,4 +254,3 @@
     </script>
 </body>
 </html>
-
