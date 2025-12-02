@@ -180,7 +180,7 @@
         let currentQuestionIndex = 0;
         let userAnswers = [];
         let employeeName = '';
-        let score = 0;
+        let score = 0; // This variable is now less critical as the score is calculated dynamically
 
         const KEYS = { QUESTION:'Question', CATEGORY:'Category', A:'A', B:'B', C:'C', D:'D', CORRECT:'CorrectAnswer' };
 
@@ -191,13 +191,18 @@
         const startStatus   = document.getElementById('start-status');
         const nextButton    = document.getElementById('next-btn');
         const prevButton    = document.getElementById('prev-btn');
-        // NOTE: answerInput still refers to the element with id 'answer-input', which is now a <textarea>
         const answerInput   = document.getElementById('answer-input'); 
         const refIdDisplay  = document.getElementById('ref-id-display');
 
         // ---------- Helper ----------
+        function getMcqCount() {
+            // Calculates the total number of scorable questions (MCQs)
+            return userAnswers.filter(a => a.isMCQ).length;
+        }
+
         function calculateFinalScore() {
-            return userAnswers.reduce((s, a) => s + (a.isCorrect ? 1 : 0), 0);
+            // ONLY scores questions that are both correct AND are MCQs.
+            return userAnswers.reduce((s, a) => s + (a.isCorrect && a.isMCQ ? 1 : 0), 0);
         }
 
         // ---------- Expose Functions Globally ----------
@@ -226,7 +231,8 @@
             userAnswers = questions.map(q => ({
                 question: q[KEYS.QUESTION],
                 category: q[KEYS.CATEGORY],
-                isMCQ: !!q[KEYS.A].trim(),
+                // isMCQ determined by having text in option A
+                isMCQ: !!q[KEYS.A].trim(), 
                 // Store the full options text here
                 options: { A:q[KEYS.A], B:q[KEYS.B], C:q[KEYS.C], D:q[KEYS.D] }, 
                 selected: null,
@@ -277,7 +283,6 @@
                 // Use .toString() in case the stored selected value is non-string (e.g., old code had 'null' or a number)
                 if (attempt.selected !== null) answerInput.value = attempt.selected.toString(); 
                 // Since this is a textarea for free-form input, we check for updates on 'input' event.
-                // The submitFillInAnswer logic is used to save the current value to the userAnswers array.
                 answerInput.oninput = submitFillInAnswer;
                 // Run once on display to ensure the current value (if re-displaying) updates the next button state.
                 submitFillInAnswer(); 
@@ -303,7 +308,8 @@
             const attempt = userAnswers[currentQuestionIndex];
             const q = questions[currentQuestionIndex];
             attempt.selected = key;
-            attempt.isCorrect = key === q[KEYS.CORRECT];
+            // MCQ scoring logic is handled here
+            attempt.isCorrect = key === q[KEYS.CORRECT]; 
 
             document.querySelectorAll('.option-button').forEach(b => {
                 b.classList.remove('bg-selection','ring-2','ring-primary/50');
@@ -325,7 +331,8 @@
                 const norm = txt.toLowerCase();
                 // Assumes correct answer for fill-in is case-insensitive match for the first value in the pipe-separated string
                 const correct = q[KEYS.CORRECT].split('|').map(c=>c.trim().toLowerCase()); 
-                attempt.isCorrect = correct.includes(norm);
+                // Fill-in answers are still marked as correct/incorrect in the object
+                attempt.isCorrect = correct.includes(norm); 
             } else {
                 attempt.isCorrect = false;
             }
@@ -358,15 +365,16 @@
         // ----- RESULTS & FIREBASE -----
         async function sendResultsToDatabase() {
             const finalScore = calculateFinalScore();
-            const total = questions.length;
-            const percentage = total ? ((finalScore/total)*100).toFixed(1) : 0;
+            const mcqCount = getMcqCount(); // The new denominator for scoring
+            const totalQuestions = questions.length;
+            const percentage = mcqCount ? ((finalScore/mcqCount)*100).toFixed(1) : 0;
             
             // --- CRITICAL CHANGE HERE: Include the 'options' object in the data sent to Firestore
             const answersData = userAnswers.map(a => ({
                 question: a.question,
                 category: a.category,
                 isMCQ: a.isMCQ,
-                options: a.options, // <--- THIS IS THE FIX
+                options: a.options, 
                 selected: a.selected,
                 correct: a.correct,
                 isCorrect: a.isCorrect
@@ -375,7 +383,8 @@
             const data = {
                 employeeName,
                 score: finalScore,
-                total,
+                total: mcqCount, // Changed 'total' to reflect the number of scorable questions (MCQs)
+                totalQuestions: totalQuestions, // Added for full context
                 percentage,
                 timestamp: new Date().toISOString(),
                 answers: answersData // Use the modified answers array
@@ -395,7 +404,6 @@
 
         function showResults() {
             const finalScore = calculateFinalScore();
-            const total = questions.length;
             score = finalScore;
 
             quizScreen.classList.add('hidden');
