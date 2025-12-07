@@ -161,23 +161,31 @@
                 return val || 'N/A'; 
             }
 
-            // ⭐ START NEW LOGIC: COUNT QUESTION TYPES ⭐
+            // ⭐ START UPDATED LOGIC: COUNT QUESTION TYPES AND SCORE DETAILS ⭐
             let mcqCount = 0;
             let openCount = 0;
+            let correctCount = 0;
+            let incorrectCount = 0;
             
             answers.forEach(a => {
-                // Determine if a question is an MCQ based on having options and a selection in the A-D range
                 const isMCQ = a.options && a.selected && /^[A-D]$/.test(a.selected);
                 if (isMCQ) {
                     mcqCount++;
+                    // Only MCQs have the 'isCorrect' field for scoring
+                    if (a.isCorrect) {
+                        correctCount++;
+                    } else {
+                        incorrectCount++;
+                    }
                 } else {
                     openCount++;
                 }
             });
 
             const totalQuestions = answers.length;
-            const mcqScoreSummary = `${data.score}/${data.total}`;
-            // ⭐ END NEW LOGIC ⭐
+            // The score color logic can be maintained but applies only to the MCQ percentage
+            const scoreColor = (data.score / data.total) >= 0.7 ? '#10b981' : (data.score / data.total) >= 0.5 ? '#f59e0b' : '#ef4444';
+            // ⭐ END UPDATED LOGIC ⭐
 
             // ⭐ SORTING LOGIC: MCQs first, then Open-Style Questions ⭐
             answers.sort((a, b) => {
@@ -239,21 +247,22 @@
                 answerBlocks += block;
             });
 
-            const scoreColor = data.score >= data.total * 0.7 ? '#10b981' : data.score >= data.total * 0.5 ? '#f59e0b' : '#ef4444';
-
-            // ⭐ NEW HTML FOR SUMMARY BOX (MODIFIED) ⭐
+            // ⭐ FINAL UPDATED SUMMARY BOX HTML ⭐
             const summaryBoxHTML = `
                 <div style="background:#f9f7ff; border: 1px solid #e0e7ff; padding: 20px; border-radius: 12px; margin: 30px auto; max-width: 600px; text-align: left;">
                     <p style="margin: 0 0 10px; font-size: 16px; font-weight: 600; color: #4338ca;">Exam Structure Summary:</p>
                     <ul style="list-style: none; padding: 0; margin: 0; font-size: 15px; line-height: 1.8;">
                         <li><strong style="color: #1f2937;">Total Questions:</strong> ${totalQuestions}</li>
-                        <li><strong style="color: #10b981;">Multiple Choice Question:</strong> ${mcqCount}</li>
-                        <li><strong style="color: #3730a3;">Open Type:</strong> ${openCount}</li>
-                        <li style="border-top: 1px dashed #e0e7ff; margin-top: 10px; padding-top: 10px;"><strong style="color: ${scoreColor};">Scoring Provided For Multiple Choice Questions:</strong> ${mcqScoreSummary}</li>
+                        <li><strong style="color: #10b981;">Multiple Choice Questions (MCQ):</strong> ${mcqCount}</li>
+                        <li><strong style="color: #3730a3;">Open Type Questions:</strong> ${openCount}</li>
+                        <li style="border-top: 1px dashed #e0e7ff; margin-top: 10px; padding-top: 10px; font-weight: 700; color: #374151;">Scoring Summary (MCQ only):</li>
+                        <li style="padding-left: 15px;"><span style="color: #10b981;">&bull; Correct:</span> <strong>${correctCount}</strong></li>
+                        <li style="padding-left: 15px;"><span style="color: #ef4444;">&bull; Incorrect:</span> <strong>${incorrectCount}</strong></li>
+                        <li style="padding-left: 15px;"><span style="color: #6b7280;">&bull; Percentage:</span> <strong>${data.percentage}%</strong></li>
                     </ul>
                 </div>
             `;
-            // ⭐ END NEW HTML FOR SUMMARY BOX ⭐
+            // ⭐ END FINAL UPDATED SUMMARY BOX HTML ⭐
 
 
             return `
@@ -268,25 +277,18 @@
                     body { font-family: 'Inter', sans-serif; margin: 0; padding: 50px; color: #1f2937; background: #f9fafb; line-height: 1.7; }
                     h1 { color: #4f46e5; font-size: 32px; text-align: center; margin: 0 0 20px; padding-bottom: 12px; border-bottom: 3px solid #e5e7eb; }
                     .header { text-align: center; margin-bottom: 40px; }
-                    .score-box { border: 2px solid #d1d5db; padding: 24px; border-radius: 16px; text-align: center; background: #f3f4f6; margin: 0 auto 40px; max-width: 400px; }
-                    .score-number { font-size: 64px; font-weight: 900; color: ${scoreColor}; margin: 12px 0; }
-                    .score-percentage { font-size: 20px; font-weight: 700; }
+                    /* Removed .score-box styles as the box is now deleted */
                     .footer { margin-top: 60px; text-align: center; color: #6b7280; font-size: 14px; }
                 </style>
             </head>
             <body>
                 <div class="header">
-                    <h1>ITOps Exam</h1>
+                    <h1>ITOps Tier 3 Assessment</h1>
                     <p style="font-size:18px;margin:8px 0;"><strong>Candidate:</strong> ${escape(data.employeeName)}</p>
                     <p style="font-size:16px;color:#6b7280;">${date}</p>
                 </div>
 
-                ${summaryBoxHTML} <div class="score-box">
-                    <h2 style="margin:0;font-size:20px;color:#374151;">Final Score</h2> <div class="score-number">${data.score}/${data.total}</div>
-                    <p class="score-percentage" style="margin:8px 0;"><strong>${data.percentage}%</strong></p>
-                </div>
-
-                <h2 style="color:#374151;font-size:22px;margin:40px 0 20px;border-bottom:2px solid #e5e7eb;padding-bottom:10px;">Detailed Answers</h2>
+                ${summaryBoxHTML} <h2 style="color:#374151;font-size:22px;margin:40px 0 20px;border-bottom:2px solid #e5e7eb;padding-bottom:10px;">Detailed Answers</h2>
                 ${answerBlocks}
 
                 <div class="footer">
@@ -298,5 +300,3 @@
     </script>
 </body>
 </html>
-
-
