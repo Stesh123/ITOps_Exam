@@ -244,11 +244,11 @@
             // ⭐ NEW HTML FOR SUMMARY BOX (MODIFIED) ⭐
             const summaryBoxHTML = `
                 <div style="background:#f9f7ff; border: 1px solid #e0e7ff; padding: 20px; border-radius: 12px; margin: 30px auto; max-width: 600px; text-align: left;">
-                    <p style="margin: 0 0 10px; font-size: 16px; font-weight: 600; color: #4338ca;">Assessment Structure Summary:</p>
+                    <p style="margin: 0 0 10px; font-size: 16px; font-weight: 600; color: #4338ca;">Exam Structure Summary:</p>
                     <ul style="list-style: none; padding: 0; margin: 0; font-size: 15px; line-height: 1.8;">
                         <li><strong style="color: #1f2937;">Total Questions:</strong> ${totalQuestions}</li>
-                        <li><strong style="color: #10b981;">Options Type (MCQ):</strong> ${mcqCount}</li>
-                        <li><strong style="color: #3730a3;">Open Type (Fill-in/Essay):</strong> ${openCount}</li>
+                        <li><strong style="color: #10b981;">Multiple Choice Question:</strong> ${mcqCount}</li>
+                        <li><strong style="color: #3730a3;">Open Type:</strong> ${openCount}</li>
                         <li style="border-top: 1px dashed #e0e7ff; margin-top: 10px; padding-top: 10px;"><strong style="color: ${scoreColor};">Scoring Provided For (MCQ):</strong> ${mcqScoreSummary}</li>
                     </ul>
                 </div>
@@ -298,3 +298,4 @@
     </script>
 </body>
 </html>
+
