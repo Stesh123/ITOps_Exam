@@ -140,8 +140,8 @@
          */
         function buildPDFHTML(data) {
             const date = new Date(data.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            const answers = data.answers || [];
-
+            let answers = data.answers || []; // Use 'let' to allow sorting
+            
             // Helper function to escape HTML special characters
             function escape(str) {
                 if (typeof str !== 'string') return str;
@@ -161,9 +161,26 @@
                 return val || 'N/A'; 
             }
 
+            // ⭐ NEW SORTING LOGIC: MCQs first, then Open-Style Questions ⭐
+            answers.sort((a, b) => {
+                // A question is an MCQ if it has 'options' and the 'selected' answer is A, B, C, or D.
+                const isAMCQ = a.options && a.selected && /^[A-D]$/.test(a.selected);
+                const isBMCQ = b.options && b.selected && /^[A-D]$/.test(b.selected);
+
+                if (isAMCQ && !isBMCQ) {
+                    return -1; // a comes before b (a is MCQ, b is open)
+                }
+                if (!isAMCQ && isBMCQ) {
+                    return 1; // b comes before a (a is open, b is MCQ)
+                }
+                // If both are the same type, maintain original order
+                return 0;
+            });
+            // ⭐ END SORTING LOGIC ⭐
+
             let answerBlocks = '';
             answers.forEach((a, i) => {
-                // Check if the question is an MCQ (has options and the selected answer is A, B, C, or D)
+                // The index (i+1) will now reflect the sorted position
                 const isMCQ = a.options && a.selected && /^[A-D]$/.test(a.selected);
                 const userFullAnswer = getFullAnswer(a, 'selected');
                 const correctFullAnswer = getFullAnswer(a, 'correct');
@@ -189,7 +206,7 @@
                         </div>`;
                     }
                 } else {
-                    // --- FILL-IN-THE-BLANK / OPEN QUESTION LOGIC (MODIFIED FOR BLUE COLOR) ---
+                    // --- FILL-IN-THE-BLANK / OPEN QUESTION LOGIC ---
                     
                     // Replace \n with <br> for explicit newlines in PDF output
                     const userAnsHTML = escape(a.selected || '').replace(/\n/g, '<br>'); 
@@ -197,10 +214,7 @@
 
                     const textStyle = "word-break: break-word; font-size: 14px;"; 
                     
-                    // NEW COLOR STYLES: 
-                    // Background: #eef2ff (indigo-50/blue-50)
-                    // Text Color: #3730a3 (indigo-700)
-                    // Border Color: #c7d2fe (indigo-300)
+                    // NEW BLUE COLOR STYLES:
                     block += `<div style="background:#eef2ff;padding:10px 14px;border-radius:8px;margin:6px 0;color:#3730a3;border:1px solid #c7d2fe; ${textStyle}">
                         <strong>ANSWER:</strong> ${userAnsDisplay}
                     </div>`;
