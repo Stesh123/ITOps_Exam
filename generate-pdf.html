@@ -249,7 +249,7 @@
                         <li><strong style="color: #1f2937;">Total Questions:</strong> ${totalQuestions}</li>
                         <li><strong style="color: #10b981;">Multiple Choice Question:</strong> ${mcqCount}</li>
                         <li><strong style="color: #3730a3;">Open Type:</strong> ${openCount}</li>
-                        <li style="border-top: 1px dashed #e0e7ff; margin-top: 10px; padding-top: 10px;"><strong style="color: ${scoreColor};">Scoring Provided For (MCQ):</strong> ${mcqScoreSummary}</li>
+                        <li style="border-top: 1px dashed #e0e7ff; margin-top: 10px; padding-top: 10px;"><strong style="color: ${scoreColor};">Scoring Provided For Multiple Choice Questions:</strong> ${mcqScoreSummary}</li>
                     </ul>
                 </div>
             `;
@@ -276,13 +276,13 @@
             </head>
             <body>
                 <div class="header">
-                    <h1>ITOps Tier 3 Assessment</h1>
+                    <h1>ITOps Exam</h1>
                     <p style="font-size:18px;margin:8px 0;"><strong>Candidate:</strong> ${escape(data.employeeName)}</p>
                     <p style="font-size:16px;color:#6b7280;">${date}</p>
                 </div>
 
                 ${summaryBoxHTML} <div class="score-box">
-                    <h2 style="margin:0;font-size:20px;color:#374151;">MCQ Final Score</h2> <div class="score-number">${data.score}/${data.total}</div>
+                    <h2 style="margin:0;font-size:20px;color:#374151;">Final Score</h2> <div class="score-number">${data.score}/${data.total}</div>
                     <p class="score-percentage" style="margin:8px 0;"><strong>${data.percentage}%</strong></p>
                 </div>
 
@@ -298,4 +298,5 @@
     </script>
 </body>
 </html>
+
 
