@@ -142,16 +142,34 @@
         // ---------- ALL 24 QUESTIONS ----------
         const questions = [
             // ================= IT ARCHITECT =================
-            { Category: 'IT Architect', Question: 'Which architecture pattern improves scalability by decoupling producers and consumers using an asynchronous backbone?', A: 'SOA', B: 'CQRS', C: 'Event-Driven Architecture', D: 'Pipe-and-Filter', CorrectAnswer: 'C' },
-            { Category: 'IT Architect', Question: 'Name the architectural pattern where write and read operations are separated into different models.', A: '', B: '', C: '', D: '', CorrectAnswer: 'CQRS' },
+            { Category: 'IT', Question: 'What is RAID and which RAID levels do you know?', A: '', B: '', C: '', D: '', CorrectAnswer: 'RAID3' },
+            { Category: 'IT', Question: 'What is MSTSC?', A: 'Windows task scheduler', B: 'Remote desktop client', C: 'Microsoft SQL Server', D: 'Network monitoring tool', CorrectAnswer: 'B' },
+            { Category: 'IT', Question: 'What is BitLocker and what is its purpose?', A: '', B: '', C: '', D: '', CorrectAnswer: 'RAID3' },
+            { Category: 'IT', Question: 'What is DiskPart and in which use cases would you need to use it?', A: '', B: '', C: '', D: '', CorrectAnswer: 'RAID3' },
+            { Category: 'IT', Question: 'You need to clone a disk. Which tools can you use and why?', A: '', B: '', C: '', D: '', CorrectAnswer: 'RAID3' },
+            { Category: 'IT', Question: 'Which port does HTTPS use by default?', A: '20', B: '80', C: '443', D: '8080', CorrectAnswer: 'C' },
+            { Category: 'IT', Question: 'What is iLO / iDRAC? What is it used for?', A: '', B: '', C: '', D: '', CorrectAnswer: 'RAID3' },
+            { Category: 'IT', Question: 'Explain what DNS does.', A: '', B: '', C: '', D: '', CorrectAnswer: 'RAID3' },
+            { Category: 'IT', Question: 'Explain the difference between SSD and HDD.', A: '', B: '', C: '', D: '', CorrectAnswer: 'RAID3' },
+            { Category: 'IT', Question: 'Which RAID level provides mirroring?', A: 'RAID 0', B: 'RAID 1', C: 'RAID 5', D: 'RAID 3', CorrectAnswer: 'B' },
+
 
             // ================= LINUX =================
-            { Category: 'Linux', Question: 'Which kernel feature enables running containers by providing isolated namespaces and control groups?', A: 'SELinux', B: 'systemd', C: 'Kernel Isolation', D: 'cgroups + namespaces', CorrectAnswer: 'D' },
-            { Category: 'Linux', Question: 'Name the Linux scheduling class designed for real-time workloads.', A: '', B: '', C: '', D: '', CorrectAnswer: 'SCHED_FIFO' },
+            { Category: 'Linux', Question: 'How do you check which directory you are currently in?', A: '', B: '', C: '', D: '', CorrectAnswer: 'pwd' },
+            { Category: 'Linux', Question: 'Which command is used to edit text files in terminal?', A: 'ifconfig', B: 'nano', C: 'ps', D: 'mkdir', CorrectAnswer: 'B' },
+            { Category: 'Linux', Question: 'What command is used to move or rename files??', A: '', B: '', C: '', D: '', CorrectAnswer: 'mv' },
+            { Category: 'Linux', Question: 'Which command shows system resource usage (CPU, RAM)?', A: 'ls', B: 'df', C: 'top', D: 'lscpu', CorrectAnswer: 'C' },
+            { Category: 'Linux', Question: 'Which directory contains system logs in Linux?', A: '/run', B: '/etc', C: '/var/log', D: '/logs', CorrectAnswer: 'C' },
 
             // ================= VMWARE =================
-            { Category: 'VMware', Question: 'Which VMware feature provides continuous availability for a VM by maintaining a secondary VM that mirrors the primary in real time?', A: 'HA', B: 'vMotion', C: 'Fault Tolerance (FT)', D: 'DRS', CorrectAnswer: 'C' },
-            { Category: 'VMware', Question: 'Name the VMware component used to manage lifecycle operations such as upgrades, patches, and firmware management.', A: '', B: '', C: '', D: '', CorrectAnswer: 'Lifecycle Manager (vLCM)' },
+            { Category: 'VMware', Question: 'What is a VMDK file and what is it used for?', A: '', B: '', C: '', D: '', CorrectAnswer: 'RAID 3' },
+            { Category: 'VMware', Question: 'Explain what vCenter Server is and why you need it when managing multiple ESXi hosts.', A: '', B: '', C: '', D: '', CorrectAnswer: 'RAID 3' },
+            { Category: 'VMware', Question: 'Which file stores the VM’s hardware configuration?', A: 'VMDK', B: 'VMX', C: 'VMSN', D: 'DRS', CorrectAnswer: 'B' },
+            { Category: 'VMware', Question: 'What is the purpose of VMware Tools and why should it be installed on VMs?', A: '', B: '', C: '', D: '', CorrectAnswer: 'RAID 3' },
+            { Category: 'VMware', Question: 'What is vMotion?', A: 'Migrating VMs with no downtime', B: 'Increasing VM RAM', C: 'A backup method', D: 'A load balancer', CorrectAnswer: 'A' },
+            { Category: 'VMware', Question: 'Describe how you would connect several ESXi hosts to shared storage.', A: '', B: '', C: '', D: '', CorrectAnswer: 'RAID 3' },
+            { Category: 'VMware', Question: 'What is a VM snapshot?', A: 'A full backup of the VM', B: 'A saved state of a VM at a specific point in time', C: 'A clone of the VM', D: 'A monitoring tool', CorrectAnswer: 'B' },
+            
 
             // ================= NETWORK =================
             { Category: 'Network', Question: 'Which routing protocol uses Dijkstra’s SPF algorithm and supports areas for scalability?', A: 'RIP', B: 'BGP', C: 'EIGRP', D: 'OSPF', CorrectAnswer: 'D' },
@@ -406,3 +424,6 @@
     </script>
 </body>
 </html>
+
+
+
