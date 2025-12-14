@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ITOps PDF Generator</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- html2pdf -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
+
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    #status { min-height: 50px; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-8">
+
+  <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-2xl p-10">
+    <h1 class="text-4xl font-bold text-indigo-600 mb-8 text-center">ITOps Exam → PDF Generator</h1>
+    
+    <div class="space-y-6">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Firestore Document ID</label>
+        <input type="text" id="docId" placeholder="e.g. L1a2B3c4D5e6F7g8H9i0" 
+               class="w-full p-4 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-lg">
+        <p class="text-xs text-gray-500 mt-2">Copy from Firestore → examResults → Document ID</p>
+      </div>
+
+      <button id="generateBtn" 
+              class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-2xl transition text-lg">
+        Generate & Download PDF
+      </button>
+    </div>
+
+    <div id="status" class="mt-8 text-center text-lg font-medium"></div>
+  </div>
+
+  <!-- Firebase Compat SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+  <!-- Main Script -->
+  <script>
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVDZPURarcDmSZTsQTUIs_8VxNLQrkSmc",
+      authDomain: "examitops.firebaseapp.com",
+      projectId: "examitops",
+      storageBucket: "examitops.firebasestorage.app",
+      messagingSenderId: "605108026221",
+      appId: "1:605108026221:web:ad7f3147f5645c11cc3864",
+      measurementId: "G-Y70D2ZDQHZ"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Button click handler
+    document.getElementById('generateBtn').onclick = async function() {
+      const docId = document.getElementById('docId').value.trim();
+      const status = document.getElementById('status');
+      const btn = document.getElementById('generateBtn');
+
+      if (!docId) {
+        status.innerHTML = '<p class="text-red-600">Please enter Document ID</p>';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Fetching...';
+      status.innerHTML = '<p class="text-blue-600">Connecting to Firestore...</p>';
+
+      try {
+        const docRef = db.collection('examResults').doc(docId);
+        const docSnap = await docRef.get();
+
+        if (!docSnap.exists) {
+          status.innerHTML = '<p class="text-red-600">Document not found!</p>';
+          btn.disabled = false;
+          btn.textContent = 'Generate & Download PDF';
+          return;
+        }
+
+        const data = docSnap.data();
+        status.innerHTML = '<p class="text-green-600">Generating PDF...</p>';
+
+        // Build HTML
+        const html = buildPDFHTML(data);
+
+        // Create iframe
+        let iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.left = '-9999px';
+        iframe.style.width = '794px';
+        iframe.style.height = '1123px';
+        document.body.appendChild(iframe);
+
+        const iframeDoc = iframe.contentDocument;
+        iframeDoc.open();
+        iframeDoc.write(html);
+        iframeDoc.close();
+
+        // Wait for load
+        await new Promise(resolve => iframe.onload = resolve);
+        await document.fonts.ready;
+
+        const fileName = `${data.employeeName.replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_')}_Assessment_${new Date(data.timestamp).toISOString().slice(0,10)}.pdf`;
+
+        const opt = {
+          margin: [0.6, 0.6, 0.6, 0.6],
+          filename: fileName,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true, logging: false },
+          jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+
+        await html2pdf().set(opt).from(iframeDoc.body).save();
+        status.innerHTML = `<p class="text-green-600">PDF Downloaded: <strong>${fileName}</strong></p>`;
+
+      } catch (err) {
+        console.error("Error:", err);
+        status.innerHTML = `<p class="text-red-600">Error: ${err.message}</p>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Generate & Download PDF';
+        const iframe = document.querySelector('iframe');
+        if (iframe) iframe.remove();
+      }
+    };
+
+    function buildPDFHTML(data) {
+      const date = new Date(data.timestamp).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      const answers = data.answers || [];
+
+      let answerBlocks = '';
+      answers.forEach((a, i) => {
+        const isMCQ = a.selected && /^[A-D]$/.test(a.selected);
+        let block = `<div style="border:1px solid #e5e7eb;padding:18px;margin:18px 0;border-radius:12px;background:#fff;">
+          <p style="font-weight:700;font-size:16px;margin:0 0 12px;color:#1f2937;">
+            ${i+1}. <span style="color:#4f46e5;">[${a.category}]</span> ${escape(a.question)}
+          </p>`;
+
+        if (isMCQ) {
+          if (a.isCorrect) {
+            block += `<div style="background:#ecfdf5;padding:10px 14px;border-radius:8px;margin:6px 0;color:#065f46;border:1px solid #a7f3d0;">
+              <strong>CORRECT:</strong> ${a.selected}
+            </div>`;
+          } else {
+            block += `<div style="background:#fef2f2;padding:10px 14px;border-radius:8px;margin:6px 0;color:#991b1b;border:1px solid #fecaca;">
+              <strong>YOUR ANSWER:</strong> ${a.selected}
+            </div>
+            <div style="background:#f0fdf4;padding:10px 14px;border-radius:8px;margin:6px 0;color:#166534;border:1px solid #bbf7d0;">
+              <strong>CORRECT:</strong> ${a.correct}
+            </div>`;
+          }
+        } else {
+          const userAns = a.selected ? escape(a.selected) : "<em style='color:#9ca3af'>No answer</em>";
+          if (a.isCorrect) {
+            block += `<div style="background:#ecfdf5;padding:10px 14px;border-radius:8px;margin:6px 0;color:#065f46;border:1px solid #a7f3d0;">
+              <strong>YOUR ANSWER (Correct):</strong> ${userAns}
+            </div>`;
+          } else {
+            block += `<div style="background:#fef2f2;padding:10px 14px;border-radius:8px;margin:6px 0;color:#991b1b;border:1px solid #fecaca;">
+              <strong>YOUR ANSWER:</strong> ${userAns}
+            </div>
+            <div style="background:#f0fdf4;padding:10px 14px;border-radius:8px;margin:6px 0;color:#166534;border:1px solid #bbf7d0;">
+              <strong>CORRECT:</strong> ${escape(a.correct.split('|').join(', '))}
+            </div>`;
+          }
+        }
+        block += `</div>`;
+        answerBlocks += block;
+      });
+
+      const scoreColor = data.score >= data.total * 0.7 ? '#10b981' : data.score >= data.total * 0.5 ? '#f59e0b' : '#ef4444';
+
+      return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: 'Inter', sans-serif; margin: 0; padding: 50px; color: #1f2937; background: #f9fafb; line-height: 1.7; }
+          h1 { color: #4f46e5; font-size: 32px; text-align: center; margin: 0 0 20px; padding-bottom: 12px; border-bottom: 3px solid #e5e7eb; }
+          .header { text-align: center; margin-bottom: 40px; }
+          .score-box { border: 2px solid #d1d5db; padding: 24px; border-radius: 16px; text-align: center; background: #f3f4f6; margin: 0 auto 40px; max-width: 400px; }
+          .score-number { font-size: 64px; font-weight: 900; color: ${scoreColor}; margin: 12px 0; }
+          .footer { margin-top: 60px; text-align: center; color: #6b7280; font-size: 14px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>ITOps Tier 3 Assessment</h1>
+          <p style="font-size:18px;margin:8px 0;"><strong>Candidate:</strong> ${escape(data.employeeName)}</p>
+          <p style="font-size:16px;color:#6b7280;">${date}</p>
+        </div>
+
+        <div class="score-box">
+          <h2 style="margin:0;font-size:20px;color:#374151;">Final Score</h2>
+          <div class="score-number">${data.score}/${data.total}</div>
+          <p style="margin:8px 0;font-size:20px;font-weight:700;"><strong>${data.percentage}%</strong></p>
+        </div>
+
+        <h2 style="color:#374151;font-size:22px;margin:40px 0 20px;border-bottom:2px solid #e5e7eb;padding-bottom:10px;">Detailed Answers</h2>
+        ${answerBlocks}
+
+        <div class="footer">
+          <p>Generated from Firestore • Powered by Stas Shnaider</p>
+        </div>
+      </body>
+      </html>`;
+    }
+
+    function escape(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
