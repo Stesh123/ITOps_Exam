@@ -161,19 +161,35 @@
                 return val || 'N/A'; 
             }
 
-            // ⭐ NEW SORTING LOGIC: MCQs first, then Open-Style Questions ⭐
+            // ⭐ START NEW LOGIC: COUNT QUESTION TYPES ⭐
+            let mcqCount = 0;
+            let openCount = 0;
+            
+            answers.forEach(a => {
+                // Determine if a question is an MCQ based on having options and a selection in the A-D range
+                const isMCQ = a.options && a.selected && /^[A-D]$/.test(a.selected);
+                if (isMCQ) {
+                    mcqCount++;
+                } else {
+                    openCount++;
+                }
+            });
+
+            const totalQuestions = answers.length;
+            const mcqScoreSummary = `${data.score}/${data.total}`;
+            // ⭐ END NEW LOGIC ⭐
+
+            // ⭐ SORTING LOGIC: MCQs first, then Open-Style Questions ⭐
             answers.sort((a, b) => {
-                // A question is an MCQ if it has 'options' and the 'selected' answer is A, B, C, or D.
                 const isAMCQ = a.options && a.selected && /^[A-D]$/.test(a.selected);
                 const isBMCQ = b.options && b.selected && /^[A-D]$/.test(b.selected);
 
                 if (isAMCQ && !isBMCQ) {
-                    return -1; // a comes before b (a is MCQ, b is open)
+                    return -1; // a comes before b
                 }
                 if (!isAMCQ && isBMCQ) {
-                    return 1; // b comes before a (a is open, b is MCQ)
+                    return 1; // b comes before a
                 }
-                // If both are the same type, maintain original order
                 return 0;
             });
             // ⭐ END SORTING LOGIC ⭐
@@ -225,6 +241,21 @@
 
             const scoreColor = data.score >= data.total * 0.7 ? '#10b981' : data.score >= data.total * 0.5 ? '#f59e0b' : '#ef4444';
 
+            // ⭐ NEW HTML FOR SUMMARY BOX (MODIFIED) ⭐
+            const summaryBoxHTML = `
+                <div style="background:#f9f7ff; border: 1px solid #e0e7ff; padding: 20px; border-radius: 12px; margin: 30px auto; max-width: 600px; text-align: left;">
+                    <p style="margin: 0 0 10px; font-size: 16px; font-weight: 600; color: #4338ca;">Exam Structure Summary:</p>
+                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 15px; line-height: 1.8;">
+                        <li><strong style="color: #1f2937;">Total Questions:</strong> ${totalQuestions}</li>
+                        <li><strong style="color: #10b981;">Multiple Choice Question:</strong> ${mcqCount}</li>
+                        <li><strong style="color: #3730a3;">Open Type:</strong> ${openCount}</li>
+                        <li style="border-top: 1px dashed #e0e7ff; margin-top: 10px; padding-top: 10px;"><strong style="color: ${scoreColor};">Scoring Provided For Multiple Choice Questions:</strong> ${mcqScoreSummary}</li>
+                    </ul>
+                </div>
+            `;
+            // ⭐ END NEW HTML FOR SUMMARY BOX ⭐
+
+
             return `
             <!DOCTYPE html>
             <html>
@@ -245,14 +276,13 @@
             </head>
             <body>
                 <div class="header">
-                    <h1>ITOps Tier 3 Assessment</h1>
+                    <h1>ITOps Exam</h1>
                     <p style="font-size:18px;margin:8px 0;"><strong>Candidate:</strong> ${escape(data.employeeName)}</p>
                     <p style="font-size:16px;color:#6b7280;">${date}</p>
                 </div>
 
-                <div class="score-box">
-                    <h2 style="margin:0;font-size:20px;color:#374151;">Final Score</h2>
-                    <div class="score-number">${data.score}/${data.total}</div>
+                ${summaryBoxHTML} <div class="score-box">
+                    <h2 style="margin:0;font-size:20px;color:#374151;">Final Score</h2> <div class="score-number">${data.score}/${data.total}</div>
                     <p class="score-percentage" style="margin:8px 0;"><strong>${data.percentage}%</strong></p>
                 </div>
 
@@ -268,3 +298,5 @@
     </script>
 </body>
 </html>
+
+
